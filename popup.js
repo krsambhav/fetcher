@@ -33,15 +33,22 @@ async function fetchPrimaryID() {
     }
   );
   var homePageData = await homePageResponse.text();
-  const regex = /"applicationId": "([a-f0-9-]{36})"/;
+  const primaryNameRegex =
+    /(?<=<span class="username">\s*)[^<]+?(?=\s*\(\d+\)\s*<\/span>)/;
+  const applicationIDRegex = /"applicationId": "([a-f0-9-]{36})"/;
 
   // Use the match() method to find matches
-  const matches = homePageData.match(regex);
+  const primaryNameMatches = homePageData.match(primaryNameRegex);
+  console.log(primaryNameMatches)
+  const applicationIDMatches = homePageData.match(applicationIDRegex);
 
   // Check if a match is found and extract the applicationId value
-  if (matches) {
-    const applicationId = matches[1]; // The first captured group is at index 1
-    return applicationId;
+  if (applicationIDMatches) {
+    var primaryNameAndIDDict = {
+      primaryName: primaryNameMatches[0],
+      primaryID: applicationIDMatches[1]
+    }
+    return primaryNameAndIDDict;
   } else {
     console.log("No applicationId found");
   }
@@ -100,6 +107,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   var primaryIDButton = document.getElementById("set-primary-id-btn");
   var dependentIDButton = document.getElementById("set-dependents-id-btn");
   var startOFCButton = document.getElementById("start-ofc-btn");
+  var primaryName = "";
   var primaryID = "";
   var dependentsIDs = "";
   var lastMonth = "";
@@ -109,9 +117,13 @@ document.addEventListener("DOMContentLoaded", async function () {
   var city = "";
   // Attach an onclick event listener to the button
   primaryIDButton.onclick = async function () {
-    primaryID = await fetchPrimaryID();
+    primaryIDAndNameDict = await fetchPrimaryID();
+    primaryName = primaryIDAndNameDict['primaryName']
+    primaryID = primaryIDAndNameDict['primaryID']
     // Code to execute when the button is clicked
+    // console.log(primaryName)
     document.getElementById("primary-id-input").value = primaryID;
+    document.getElementById("primary-user-name-span").innerHTML = primaryName;
   };
   dependentIDButton.onclick = async function () {
     dependentsIDs = await fetchDependentIDs(primaryID);
@@ -134,6 +146,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     else isSleeper = true;
     city = document.getElementById("city-id-input").value.toLowerCase();
     var userDetails = {
+      primaryName,
       primaryID,
       dependentsIDs,
       lastMonth,

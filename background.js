@@ -69,6 +69,7 @@ const monthNames = [
   },
 ];
 
+var primaryName;
 var isRes;
 var primaryID;
 var applicationIDs = [];
@@ -116,6 +117,7 @@ chrome.runtime.onMessage.addListener(messageReceived);
 
 function messageReceived(msg) {
   // console.log(`Received ${JSON.stringify(msg)}`);
+  primaryName = msg["primaryName"];
   primaryID = msg["primaryID"];
   applicationIDs = JSON.parse(msg["dependentsIDs"]);
   city = msg["city"];
@@ -128,7 +130,7 @@ function messageReceived(msg) {
   async function demo() {
     if (serviceStarted == false) {
       serviceStarted = true;
-      console.log("Service Started!");
+      console.log(`Service Started! Name: ${primaryName}`);
       for (let i = 0; i < 5000000; i++) {
         if (consularBooked) {
           break;
@@ -249,7 +251,7 @@ async function startService() {
   console.log(
     `Location: ${capitalizeFirstLetter(
       city
-    )} | Time: ${new Date().toLocaleString()}`
+    )} | Time: ${new Date().toLocaleString()} | Name: ${primaryName}`
   );
   responseFetched = true;
   if (!ofcBooked && !consularBooked) {
@@ -327,12 +329,12 @@ async function startOFC(city) {
         sendCustomMsg(
           `OFC Booked For ${capitalizeFirstLetter(
             city
-          )} On ${day}/${month}/${year}`
+          )} On ${day}/${month}/${year} For ${primaryName}`
         );
         console.log(
           `OFC Booked For ${capitalizeFirstLetter(
             city
-          )} On ${day}/${month}/${year}`
+          )} On ${day}/${month}/${year} For ${primaryName}`
         );
         return 1;
       }
@@ -381,12 +383,12 @@ async function startConsular(city) {
     sendCustomMsg(
       `Consular Booked For ${capitalizeFirstLetter(
         city
-      )} On ${day}/${month}/${year}`
+      )} On ${day}/${month}/${year} For ${primaryName}`
     );
     console.log(
       `Consular Booked For ${capitalizeFirstLetter(
         city
-      )} On ${day}/${month}/${year}`
+      )} On ${day}/${month}/${year} For ${primaryName}`
     );
     return 1;
   }
@@ -443,7 +445,7 @@ async function getOFCDate(city) {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.log('Exception!')
+      console.log("Exception!");
       continue;
     }
   }
