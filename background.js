@@ -122,7 +122,7 @@ function messageReceived(msg) {
   primaryName = msg["primaryName"];
   primaryID = msg["primaryID"];
   if (msg["dependentsIDs"] === primaryID) {
-    applicationIDs = []
+    applicationIDs = [];
   } else {
     applicationIDs = JSON.parse(msg["dependentsIDs"]);
   }
@@ -269,7 +269,9 @@ async function startService() {
   console.log(
     `Location: ${capitalizeFirstLetter(
       city
-    )} | Time: ${new Date().toLocaleString()} | Name: ${primaryName} | Total Pax: ${applicationIDs.length}`
+    )} | Time: ${new Date().toLocaleString()} | Name: ${primaryName} | Total Pax: ${
+      applicationIDs.length == 0 ? 1 : applicationIDs.length
+    }`
   );
   responseFetched = true;
   if (!ofcBooked && !consularBooked) {
