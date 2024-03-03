@@ -126,7 +126,7 @@ function messageReceived(msg) {
   } else {
     applicationIDs = JSON.parse(msg["dependentsIDs"]);
   }
-  console.log(applicationIDs)
+  // console.log(applicationIDs)
   city = msg["city"];
   earliestDate = msg["earliestDate"];
   earliestMonth = msg["earliestMonth"];
