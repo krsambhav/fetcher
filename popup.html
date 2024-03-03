@@ -14,41 +14,76 @@
 
   <body
     style="
-      width: 250px;
+      width: 600px;
       height: 600px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      flex-wrap: wrap;
     "
   >
-    <div class="primary-name-container">
+    <div class="primary-name-container" style="margin-top: 20px;">
       <span>User: </span><span id="primary-user-name-span"></span>
     </div>
-    <div class="primaryID-container">
-      <p>Primary ID:</p>
-      <input type="text" id="primary-id-input" />
-      <button id="set-primary-id-btn" class="btn">Fetch</button>
-    </div>
-    <div class="dependents-container">
-      <p>Dependent IDs:</p>
-      <input type="text" id="dependents-id-input" />
-      <button id="set-dependents-id-btn">Fetch</button>
+    <div
+      class="primary-dependent-container"
+      style="
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 20px;
+      "
+    >
+      <div class="primaryID-container">
+        <p>Primary ID:</p>
+        <input type="text" id="primary-id-input" />
+        <button id="set-primary-id-btn" class="btn">Fetch</button>
+      </div>
+      <div class="dependents-container">
+        <p>Dependent IDs:</p>
+        <input type="text" id="dependents-id-input" />
+        <button id="set-dependents-id-btn">Fetch</button>
+      </div>
     </div>
     <div class="city-container">
       <p>Location:</p>
       <input type="text" id="city-id-input" />
     </div>
-    <div class="last-date-filter-container">
-      <p>Last Preferred Month:</p>
-      <input type="number" id="last-month-input" value="3" />
-      <p>Last Preferred Date:</p>
-      <input type="number" id="last-date-input" value="10" />
+    <div
+      class="last-date-filter-container"
+      style="
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 20px;
+      "
+    >
+      <div class="month">
+        <p>Last Preferred Month:</p>
+        <input type="number" id="last-month-input" value="3" />
+      </div>
+      <div class="date">
+        <p>Last Preferred Date:</p>
+        <input type="number" id="last-date-input" value="10" />
+      </div>
     </div>
-    <div class="earliest-date-filter-container">
-      <p>Earliest Preferred Month:</p>
-      <input type="number" id="earliest-month-input" value="2" />
-      <p>Earliest Preferred Date:</p>
-      <input type="number" id="earliest-date-input" value="1" />
+    <div
+      class="earliest-date-filter-container"
+      style="
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 20px;
+      "
+    >
+      <div class="month">
+        <p>Earliest Preferred Month:</p>
+        <input type="number" id="earliest-month-input" value="2" />
+      </div>
+      <div class="date">
+        <p>Earliest Preferred Date:</p>
+        <input type="number" id="earliest-date-input" value="1" />
+      </div>
     </div>
     <div class="res-container">
       <p>Reschedule?</p>
@@ -57,6 +92,14 @@
     <div class="sleeper-container">
       <p>Sleeper?</p>
       <input type="number" id="sleeper-input" value="0" />
+    </div>
+    <div class="await-container">
+      <p>Await?</p>
+      <input type="number" id="await-input" value="1" />
+    </div>
+    <div class="delay-container">
+      <p>Delay Multiplier:</p>
+      <input type="number" id="delay-input" value="1" />
     </div>
     <div class="submit-btn" style="margin-top: 20px">
       <button id="start-ofc-btn">Start OFC</button>

@@ -39,15 +39,15 @@ async function fetchPrimaryID() {
 
   // Use the match() method to find matches
   const primaryNameMatches = homePageData.match(primaryNameRegex);
-  console.log(primaryNameMatches)
+  console.log(primaryNameMatches);
   const applicationIDMatches = homePageData.match(applicationIDRegex);
 
   // Check if a match is found and extract the applicationId value
   if (applicationIDMatches) {
     var primaryNameAndIDDict = {
       primaryName: primaryNameMatches[0],
-      primaryID: applicationIDMatches[1]
-    }
+      primaryID: applicationIDMatches[1],
+    };
     return primaryNameAndIDDict;
   } else {
     console.log("No applicationId found");
@@ -115,11 +115,13 @@ document.addEventListener("DOMContentLoaded", async function () {
   var earliestMonth = "";
   var earliestDate = "";
   var city = "";
+  var awaitChecker = "";
+  var delay = 1;
   // Attach an onclick event listener to the button
   primaryIDButton.onclick = async function () {
     primaryIDAndNameDict = await fetchPrimaryID();
-    primaryName = primaryIDAndNameDict['primaryName']
-    primaryID = primaryIDAndNameDict['primaryID']
+    primaryName = primaryIDAndNameDict["primaryName"];
+    primaryID = primaryIDAndNameDict["primaryID"];
     // Code to execute when the button is clicked
     // console.log(primaryName)
     document.getElementById("primary-id-input").value = primaryID;
@@ -144,6 +146,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     isSleeper = parseInt(document.getElementById("sleeper-input").value);
     if (isSleeper == 0) isSleeper = false;
     else isSleeper = true;
+    awaitChecker = parseInt(document.getElementById("await-input").value);
+    if (awaitChecker == 0) awaitChecker = false;
+    else awaitChecker = true;
+    delay = parseInt(document.getElementById("delay-input").value);
     city = document.getElementById("city-id-input").value.toLowerCase();
     var userDetails = {
       primaryName,
@@ -156,6 +162,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       city,
       isReschedule,
       isSleeper,
+      awaitChecker,
+      delay,
     };
     chrome.runtime.sendMessage(userDetails, function (response) {
       console.log(response);

@@ -79,6 +79,8 @@ var lastMonth;
 var lastDate;
 var earliestMonth;
 var earliestDate;
+var awaitChecker = false;
+var delay;
 
 //Don't Touch
 var serviceStarted = false;
@@ -127,6 +129,9 @@ function messageReceived(msg) {
   lastDate = msg["lastDate"];
   isRes = msg["isReschedule"];
   sleeper = msg["isSleeper"];
+  awaitChecker = msg["awaitChecker"];
+  delay = msg["delay"];
+
   async function demo() {
     if (serviceStarted == false) {
       serviceStarted = true;
@@ -143,7 +148,11 @@ function messageReceived(msg) {
             (currentMinute >= 0 && currentMinute <= 5) ||
             currentMinute >= 59
           ) {
-            var serviceBinaryResponse = startService();
+            if (awaitChecker) {
+              var serviceBinaryResponse = await startService();
+            } else {
+              var serviceBinaryResponse = startService();
+            }
             if (serviceBinaryResponse == 1) {
               console.log("All Done!");
               break;
@@ -152,13 +161,17 @@ function messageReceived(msg) {
             // console.log("Waiting!");
           }
         } else {
-          var serviceBinaryResponse = startService();
+          if (awaitChecker) {
+            var serviceBinaryResponse = await startService();
+          } else {
+            var serviceBinaryResponse = startService();
+          }
           if (serviceBinaryResponse == 1) {
             console.log("All Done!");
             break;
           }
         }
-        const randomNumber = randomFloat(0.5, 1.4) * 5000;
+        const randomNumber = randomFloat(0.5, 1.4) * delay * 1000;
         // console.log(
         //   `Sleeping For ${(randomNumber / 1000).toFixed(2)} Seconds`
         // );
@@ -251,7 +264,7 @@ async function startService() {
   console.log(
     `Location: ${capitalizeFirstLetter(
       city
-    )} | Time: ${new Date().toLocaleString()} | Name: ${primaryName}`
+    )} | Time: ${new Date().toLocaleString()} | Name: ${primaryName} | Total Pax: ${applicationIDs.length}`
   );
   responseFetched = true;
   if (!ofcBooked && !consularBooked) {
@@ -301,7 +314,11 @@ async function startOFC(city) {
   // );
   if (year == 2024) {
     //suck fuck
-    if (month == lastMonth && day < lastDate) {
+    if (
+      (month == lastMonth && day <= lastDate) ||
+      (month == earliestMonth && day >= earliestDate) ||
+      (month > earliestMonth && month < lastMonth)
+    ) {
       const ofcSlotResponse = await getOFCSlot(dayID, city);
       var ofcSlotResponseSlots;
       if (ofcSlotResponse["ScheduleEntries"].length > 0) {
