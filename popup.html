@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+    />
+    <style>
+      * {
+        font-family: "Courier New", Courier, monospace;
+      }
+    </style>
+  </head>
+
+  <body
+    style="
+      width: 250px;
+      height: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    "
+  >
+    <div class="primaryID-container">
+      <p>Primary ID:</p>
+      <input type="text" id="primary-id-input" />
+      <button id="set-primary-id-btn" class="btn">Fetch</button>
+    </div>
+    <div class="dependents-container">
+      <p>Dependent IDs:</p>
+      <input type="text" id="dependents-id-input" />
+      <button id="set-dependents-id-btn">Fetch</button>
+    </div>
+    <div class="city-container">
+      <p>Location:</p>
+      <input type="text" id="city-id-input" />
+    </div>
+    <div class="last-date-filter-container">
+      <p>Last Preferred Month:</p>
+      <input type="number" id="last-month-input" value="3" />
+      <p>Last Preferred Date:</p>
+      <input type="number" id="last-date-input" value="10" />
+    </div>
+    <div class="earliest-date-filter-container">
+      <p>Earliest Preferred Month:</p>
+      <input type="number" id="earliest-month-input" value="2" />
+      <p>Earliest Preferred Date:</p>
+      <input type="number" id="earliest-date-input" value="1" />
+    </div>
+    <div class="res-container">
+      <p>Reschedule?</p>
+      <input type="number" id="res-input" value="0" />
+    </div>
+    <div class="sleeper-container">
+      <p>Sleeper?</p>
+      <input type="number" id="sleeper-input" value="0" />
+    </div>
+    <div class="submit-btn" style="margin-top: 20px">
+      <button id="start-ofc-btn">Start OFC</button>
+      <button id="start-consular-btn">Consular</button>
+    </div>
+  </body>
+  <script src="./popup.js"></script>
+</html>
