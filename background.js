@@ -121,7 +121,12 @@ function messageReceived(msg) {
   // console.log(`Received ${JSON.stringify(msg)}`);
   primaryName = msg["primaryName"];
   primaryID = msg["primaryID"];
-  applicationIDs = JSON.parse(msg["dependentsIDs"]);
+  if (msg["dependentsIDs"] === primaryID) {
+    applicationIDs = []
+  } else {
+    applicationIDs = JSON.parse(msg["dependentsIDs"]);
+  }
+  console.log(applicationIDs)
   city = msg["city"];
   earliestDate = msg["earliestDate"];
   earliestMonth = msg["earliestMonth"];
