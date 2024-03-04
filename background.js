@@ -247,7 +247,7 @@ function sendCustomMsg(message) {
     )}`
   );
   // .then(response => response.json()).then(data => console.log(data))
-  console.log("Sent TG Message");
+  // console.log("Sent TG Message");
 }
 
 function formatRawDate(rawDate) {
@@ -322,7 +322,7 @@ async function startOFC(city) {
   if (year == 2024) {
     //suck fuck
     if (
-      (earliestMonth == lastMonth && day >= earliestDate && day <= lastDate) ||
+      (earliestMonth == lastMonth && day >= earliestDate && day <= lastDate && earliestMonth == month) ||
       (month == lastMonth && day <= lastDate) ||
       (month == earliestMonth && day >= earliestDate) ||
       (month > earliestMonth && month < lastMonth)
@@ -348,7 +348,7 @@ async function startOFC(city) {
         latestAvailableSlotTimeID
       );
       console.log(ofcBookingResponse);
-      console.log("Booking Slot");
+      console.log("Booking OFC");
       if (ofcBookingResponse["AllScheduled"] == true) {
         ofcBooked = true;
         sendCustomMsg(
@@ -362,6 +362,8 @@ async function startOFC(city) {
           )} On ${day}/${month}/${year} For ${primaryName}`
         );
         return 1;
+      } else {
+        console.log('OFC Booking Error')
       }
     }
   }
@@ -402,7 +404,7 @@ async function startConsular(city) {
     latestConsularDateID,
     latestConsularSlotID
   );
-  console.log(latestConsularDateID, latestConsularSlotID);
+  // console.log(latestConsularDateID, latestConsularSlotID);
   if (consularBookingResponse["AllScheduled"] == true) {
     consularBooked = true;
     sendCustomMsg(
