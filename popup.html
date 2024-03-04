@@ -22,7 +22,7 @@
       flex-wrap: wrap;
     "
   >
-    <div class="primary-name-container" style="margin-top: 20px;">
+    <div class="primary-name-container" style="margin-top: 20px">
       <span>User: </span><span id="primary-user-name-span"></span>
     </div>
     <div
@@ -45,9 +45,19 @@
         <button id="set-dependents-id-btn">Fetch</button>
       </div>
     </div>
-    <div class="city-container">
+    <!-- <div class="city-container">
       <p>Location:</p>
       <input type="text" id="city-id-input" />
+    </div> -->
+    <div class="city-container">
+      <p>Location:</p>
+      <select id="city-selector">
+        <option value="chennai">Chennai</option>
+        <option value="mumbai">Mumbai</option>
+        <option value="kolkata">Kolkata</option>
+        <option value="delhi">Delhi</option>
+        <option value="hyderabad">Hyderabad</option>
+      </select>
     </div>
     <div
       class="last-date-filter-container"
@@ -78,7 +88,7 @@
     >
       <div class="month">
         <p>Earliest Preferred Month:</p>
-        <input type="number" id="earliest-month-input" value="2" />
+        <input type="number" id="earliest-month-input" value="3" />
       </div>
       <div class="date">
         <p>Earliest Preferred Date:</p>
@@ -91,7 +101,7 @@
     </div>
     <div class="sleeper-container">
       <p>Sleeper?</p>
-      <input type="number" id="sleeper-input" value="0" />
+      <input type="number" id="sleeper-input" value="1" />
     </div>
     <div class="await-container">
       <p>Await?</p>

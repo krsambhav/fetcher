@@ -45,7 +45,7 @@ async function fetchPrimaryID() {
   // Check if a match is found and extract the applicationId value
   if (applicationIDMatches) {
     var primaryNameAndIDDict = {
-      primaryName: primaryNameMatches[0],
+      primaryName: primaryNameMatches[0].trim(),
       primaryID: applicationIDMatches[1],
     };
     return primaryNameAndIDDict;
@@ -107,6 +107,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   var primaryIDButton = document.getElementById("set-primary-id-btn");
   var dependentIDButton = document.getElementById("set-dependents-id-btn");
   var startOFCButton = document.getElementById("start-ofc-btn");
+  var citySelector = document.getElementById("city-selector");
   var primaryName = "";
   var primaryID = "";
   var dependentsIDs = "";
@@ -127,6 +128,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("primary-id-input").value = primaryID;
     document.getElementById("primary-user-name-span").innerHTML = primaryName;
   };
+  citySelector.onchange = async function() {
+    city = citySelector.value;
+  }
   dependentIDButton.onclick = async function () {
     dependentsIDs = await fetchDependentIDs(primaryID);
     document.getElementById("dependents-id-input").value = dependentsIDs;
@@ -150,7 +154,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (awaitChecker == 0) awaitChecker = false;
     else awaitChecker = true;
     delay = parseInt(document.getElementById("delay-input").value);
-    city = document.getElementById("city-id-input").value.toLowerCase();
+    // city = document.getElementById("city-id-input").value.toLowerCase();
     var userDetails = {
       primaryName,
       primaryID,

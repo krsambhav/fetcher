@@ -160,9 +160,15 @@ function messageReceived(msg) {
     if (serviceStarted == false) {
       serviceStarted = true;
       console.log(
-        `Service Started! Name: ${primaryName} | ${
+        `Name: ${primaryName} | ${
           applicationIDs.length == 0 ? 1 : applicationIDs.length
-        } Pax | Location: ${city} | Range: From ${earliestDate}/${earliestMonth} To ${lastDate}/${lastMonth} | Reschedule: ${isRes}`
+        } Pax | Location: ${capitalizeFirstLetter(
+          city
+        )} | Range: From ${earliestDate} ${
+          monthNames[earliestMonth - 1]["abbreviation"]
+        } To ${lastDate} ${
+          monthNames[lastMonth - 1]["abbreviation"]
+        } | Reschedule: ${isRes}`
       );
       for (let i = 0; i < 5000000; i++) {
         if (consularBooked) {
@@ -370,8 +376,8 @@ async function startOFC(city) {
         day >= earliestDate &&
         day <= lastDate &&
         earliestMonth == month) ||
-      (month == lastMonth && day <= lastDate) ||
-      (month == earliestMonth && day >= earliestDate) ||
+      (month == lastMonth && day <= lastDate && month != earliestMonth) ||
+      (month == earliestMonth && day >= earliestDate && month != lastMonth) ||
       (month > earliestMonth && month < lastMonth)
     ) {
       const ofcSlotResponse = await getOFCSlot(dayID, city);
