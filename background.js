@@ -87,6 +87,8 @@ var serviceStarted = false;
 var sleepSetTimeout_ctrl;
 var ofcBooked = false;
 var consularBooked = false;
+var traceValue;
+var parentValue;
 
 function sleep(ms) {
   clearInterval(sleepSetTimeout_ctrl);
@@ -117,6 +119,22 @@ const new_bot_token = "6730508363:AAEfASgDNed5lqn6JUOJSLrXSM49XyICWkg";
 
 chrome.runtime.onMessage.addListener(messageReceived);
 
+function generateRandomStringBytes(size) {
+  let id = "";
+  for (let i = 0; i < size; i++) {
+    id += ("00" + Math.floor(Math.random() * 256).toString(16)).slice(-2);
+  }
+  return id;
+}
+
+function generateTranceparent() {
+  return `00-${traceValue}-${parentValue}-01`;
+}
+
+function generateRequestID() {
+  return `|${traceValue}.${parentValue}`;
+}
+
 function messageReceived(msg) {
   // console.log(`Received ${JSON.stringify(msg)}`);
   primaryName = msg["primaryName"];
@@ -136,11 +154,16 @@ function messageReceived(msg) {
   sleeper = msg["isSleeper"];
   awaitChecker = msg["awaitChecker"];
   delay = msg["delay"];
+  traceValue = generateRandomStringBytes(16);
 
   async function demo() {
     if (serviceStarted == false) {
       serviceStarted = true;
-      console.log(`Service Started! Name: ${primaryName}`);
+      console.log(
+        `Service Started! Name: ${primaryName} | ${
+          applicationIDs.length == 0 ? 1 : applicationIDs.length
+        } Pax | Location: ${city} | Range: From ${earliestDate}/${earliestMonth} To ${lastDate}/${lastMonth} | Reschedule: ${isRes}`
+      );
       for (let i = 0; i < 5000000; i++) {
         if (consularBooked) {
           break;
@@ -174,14 +197,14 @@ function messageReceived(msg) {
         } else {
           if (awaitChecker) {
             var serviceBinaryResponse = await startService();
-            if (serviceBinaryResponse == 'ECE') {
+            if (serviceBinaryResponse == "ECE") {
               // console.log('ECE')
-              return 'ECE';
+              return "ECE";
             }
           } else {
             var serviceBinaryResponse = startService();
-            if (serviceBinaryResponse == 'ECE') {
-              return 'ECE';
+            if (serviceBinaryResponse == "ECE") {
+              return "ECE";
             }
           }
           if (serviceBinaryResponse == 1) {
@@ -279,6 +302,7 @@ function formatRawDate(rawDate) {
 async function startService() {
   // console.log("Fetching");
   // sendCustomMsg('Hello Sam, Slots Booked')
+  parentValue = generateRandomStringBytes(8);
   console.log(
     `Location: ${capitalizeFirstLetter(
       city
@@ -465,7 +489,7 @@ async function getOFCDate(city) {
             accept: "application/json, text/javascript, */*; q=0.01",
             "accept-language": "en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7",
             "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-            "request-id": "|86350a23908f432b897a84a74db4cb70.0c4d083bd75841b0",
+            "request-id": generateRequestID(),
             "sec-ch-ua":
               '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
             "sec-ch-ua-arch": '"arm"',
@@ -480,8 +504,7 @@ async function getOFCDate(city) {
             "sec-fetch-dest": "empty",
             "sec-fetch-mode": "cors",
             "sec-fetch-site": "same-origin",
-            traceparent:
-              "00-86350a23908f432b897a84a74db4cb70-0c4d083bd75841b0-01",
+            traceparent: generateTranceparent(),
             "x-requested-with": "XMLHttpRequest",
           },
           referrer: "https://www.usvisascheduling.com/en-US/ofc-schedule/",
@@ -497,6 +520,7 @@ async function getOFCDate(city) {
       const data = await response.json();
       return data;
     } catch (error) {
+      // console.log(error)
       if (errorCount > 10) {
         sendCustomMsg(`Error Count Exceeded For ${primaryName}`);
         console.log("Error Count Exceeded!");
@@ -521,7 +545,7 @@ async function getOFCSlot(dayID, city) {
         accept: "application/json, text/javascript, */*; q=0.01",
         "accept-language": "en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7",
         "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "request-id": "|5ff5f351e3714206bbe49ccc8fc7efb2.9693f88422de40e4",
+        "request-id": generateRequestID(),
         "sec-ch-ua":
           '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
         "sec-ch-ua-arch": '"arm"',
@@ -536,7 +560,7 @@ async function getOFCSlot(dayID, city) {
         "sec-fetch-dest": "empty",
         "sec-fetch-mode": "cors",
         "sec-fetch-site": "same-origin",
-        traceparent: "00-5ff5f351e3714206bbe49ccc8fc7efb2-9693f88422de40e4-01",
+        traceparent: generateTranceparent(),
         "x-requested-with": "XMLHttpRequest",
       },
       referrer: "https://www.usvisascheduling.com/en-US/ofc-schedule/",
@@ -564,7 +588,7 @@ async function bookOFCSlot(city, dayID, slotID) {
       accept: "application/json, text/javascript, */*; q=0.01",
       "accept-language": "en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7",
       "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-      "request-id": "|11d150d6e1dd49d3a96ca3cd7273882c.85ae99925e524ad0",
+      "request-id": generateRequestID(),
       "sec-ch-ua":
         '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
       "sec-ch-ua-arch": '"arm"',
@@ -579,7 +603,7 @@ async function bookOFCSlot(city, dayID, slotID) {
       "sec-fetch-dest": "empty",
       "sec-fetch-mode": "cors",
       "sec-fetch-site": "same-origin",
-      traceparent: "00-11d150d6e1dd49d3a96ca3cd7273882c-85ae99925e524ad0-01",
+      traceparent: generateTranceparent(),
       "x-requested-with": "XMLHttpRequest",
     },
     referrer: "https://www.usvisascheduling.com/en-US/ofc-schedule/",
@@ -604,7 +628,7 @@ async function getConsularDates(consularLocation) {
         accept: "application/json, text/javascript, */*; q=0.01",
         "accept-language": "en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7",
         "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "request-id": "|a655e829ef304713b1e31074a8a82593.97c062265a9b437b",
+        "request-id": generateRequestID(),
         "sec-ch-ua":
           '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
         "sec-ch-ua-arch": '"arm"',
@@ -619,7 +643,7 @@ async function getConsularDates(consularLocation) {
         "sec-fetch-dest": "empty",
         "sec-fetch-mode": "cors",
         "sec-fetch-site": "same-origin",
-        traceparent: "00-a655e829ef304713b1e31074a8a82593-97c062265a9b437b-01",
+        traceparent: generateTranceparent(),
         "x-requested-with": "XMLHttpRequest",
       },
       referrer: "https://www.usvisascheduling.com/en-US/schedule/",
@@ -644,7 +668,7 @@ async function getConsularSlots(consularLocation, dayID) {
         accept: "application/json, text/javascript, */*; q=0.01",
         "accept-language": "en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7",
         "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "request-id": "|a655e829ef304713b1e31074a8a82593.97c062265a9b437b",
+        "request-id": generateRequestID(),
         "sec-ch-ua":
           '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
         "sec-ch-ua-arch": '"arm"',
@@ -659,7 +683,7 @@ async function getConsularSlots(consularLocation, dayID) {
         "sec-fetch-dest": "empty",
         "sec-fetch-mode": "cors",
         "sec-fetch-site": "same-origin",
-        traceparent: "00-a655e829ef304713b1e31074a8a82593-97c062265a9b437b-01",
+        traceparent: generateTranceparent(),
         "x-requested-with": "XMLHttpRequest",
       },
       referrer: "https://www.usvisascheduling.com/en-US/schedule/",
@@ -688,7 +712,7 @@ async function bookConsularSlot(consularLocation, dayID, slotID) {
         accept: "application/json, text/javascript, */*; q=0.01",
         "accept-language": "en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7",
         "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "request-id": "|0c7e6c011adb4756aaa213643fc42b07.24b831d39e204f0a",
+        "request-id": generateRequestID(),
         "sec-ch-ua":
           '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
         "sec-ch-ua-arch": '"arm"',
@@ -703,7 +727,7 @@ async function bookConsularSlot(consularLocation, dayID, slotID) {
         "sec-fetch-dest": "empty",
         "sec-fetch-mode": "cors",
         "sec-fetch-site": "same-origin",
-        traceparent: "00-0c7e6c011adb4756aaa213643fc42b07-24b831d39e204f0a-01",
+        traceparent: generateTranceparent(),
         "x-requested-with": "XMLHttpRequest",
       },
       referrer: "https://www.usvisascheduling.com/en-US/schedule/",
