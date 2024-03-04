@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   var lastDate = "";
   var earliestMonth = "";
   var earliestDate = "";
-  var city = "";
+  var city = "mumbai";
   var awaitChecker = "";
   var delay = 1;
   // Attach an onclick event listener to the button
