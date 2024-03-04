@@ -322,6 +322,7 @@ async function startOFC(city) {
   if (year == 2024) {
     //suck fuck
     if (
+      (earliestMonth == lastMonth && day >= earliestDate && day <= lastDate) ||
       (month == lastMonth && day <= lastDate) ||
       (month == earliestMonth && day >= earliestDate) ||
       (month > earliestMonth && month < lastMonth)
