@@ -155,8 +155,14 @@ function messageReceived(msg) {
           ) {
             if (awaitChecker) {
               var serviceBinaryResponse = await startService();
+              if (serviceBinaryResponse == "ECE") {
+                return "ECE";
+              }
             } else {
               var serviceBinaryResponse = startService();
+              if (serviceBinaryResponse == "ECE") {
+                return "ECE";
+              }
             }
             if (serviceBinaryResponse == 1) {
               console.log("All Done!");
@@ -168,8 +174,15 @@ function messageReceived(msg) {
         } else {
           if (awaitChecker) {
             var serviceBinaryResponse = await startService();
+            if (serviceBinaryResponse == 'ECE') {
+              // console.log('ECE')
+              return 'ECE';
+            }
           } else {
             var serviceBinaryResponse = startService();
+            if (serviceBinaryResponse == 'ECE') {
+              return 'ECE';
+            }
           }
           if (serviceBinaryResponse == 1) {
             console.log("All Done!");
@@ -276,6 +289,10 @@ async function startService() {
   responseFetched = true;
   if (!ofcBooked && !consularBooked) {
     var ofcBookingBinaryResponse = await startOFC(city);
+    if (ofcBookingBinaryResponse == "ECE") {
+      // console.log('ECE1')
+      return "ECE";
+    }
     if (ofcBookingBinaryResponse == 1) {
       var consularBookingBinaryResponse = await startConsular(city);
       if (consularBookingBinaryResponse == 1) {
@@ -301,6 +318,9 @@ async function startService() {
 
 async function startOFC(city) {
   const ofcDateResponse = await getOFCDate(city);
+  if (ofcDateResponse == "ECE") {
+    return "ECE";
+  }
   // console.log(ofcDateResponse);
   var ofcDatesArr = ofcDateResponse["ScheduleDays"];
   // console.log(jsonDates);
@@ -322,7 +342,10 @@ async function startOFC(city) {
   if (year == 2024) {
     //suck fuck
     if (
-      (earliestMonth == lastMonth && day >= earliestDate && day <= lastDate && earliestMonth == month) ||
+      (earliestMonth == lastMonth &&
+        day >= earliestDate &&
+        day <= lastDate &&
+        earliestMonth == month) ||
       (month == lastMonth && day <= lastDate) ||
       (month == earliestMonth && day >= earliestDate) ||
       (month > earliestMonth && month < lastMonth)
@@ -363,7 +386,8 @@ async function startOFC(city) {
         );
         return 1;
       } else {
-        console.log('OFC Booking Error')
+        console.log("OFC Booking Error");
+        sendCustomMsg(`OFC Error For ${primaryName}`);
       }
     }
   }
@@ -423,6 +447,7 @@ async function startConsular(city) {
 }
 
 async function getOFCDate(city) {
+  var errorCount = 0;
   while (true) {
     try {
       // console.log(city)
@@ -472,6 +497,14 @@ async function getOFCDate(city) {
       const data = await response.json();
       return data;
     } catch (error) {
+      if (errorCount > 10) {
+        sendCustomMsg(`Error Count Exceeded For ${primaryName}`);
+        console.log("Error Count Exceeded!");
+        return "ECE";
+      } else {
+        // console.log('Error In Getting OFC Date!')
+        errorCount++;
+      }
       console.log("Exception!");
       continue;
     }
