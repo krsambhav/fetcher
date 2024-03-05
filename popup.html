@@ -5,6 +5,7 @@
       http-equiv="Content-Security-Policy"
       content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'"
     />
+    <link rel="stylesheet" href="./tailwind.min.css">
     <style>
       * {
         font-family: "Courier New", Courier, monospace;
@@ -26,7 +27,7 @@
       <span>User: </span><span id="primary-user-name-span"></span>
     </div>
     <div
-      class="primary-dependent-container"
+      class="primary-dependent-container mt-5"
       style="
         display: flex;
         flex-direction: row;
@@ -35,23 +36,23 @@
       "
     >
       <div class="primaryID-container">
-        <p>Primary ID:</p>
-        <input type="text" id="primary-id-input" />
-        <button id="set-primary-id-btn" class="btn">Fetch</button>
+        <!-- <p>Primary ID:</p> -->
+        <input type="text" id="primary-id-input" class="shadow-md border border-black outline-none px-2 py-1 rounded-sm" placeholder="Primary ID" />
+        <button id="set-primary-id-btn" class="btn bg-black text-white rounded-md px-2 py-1 shadow-md">Fetch</button>
       </div>
       <div class="dependents-container">
-        <p>Dependent IDs:</p>
-        <input type="text" id="dependents-id-input" />
-        <button id="set-dependents-id-btn">Fetch</button>
+        <!-- <p>Dependent IDs:</p> -->
+        <input type="text" id="dependents-id-input" class="shadow-md border border-black outline-none px-2 py-1 rounded-sm outline-none" placeholder="Dependents IDs"  />
+        <button id="set-dependents-id-btn" class="btn bg-black text-white rounded-md px-2 py-1 shadow-md outline-none">Fetch</button>
       </div>
     </div>
     <!-- <div class="city-container">
       <p>Location:</p>
       <input type="text" id="city-id-input" />
     </div> -->
-    <div class="city-container">
-      <p>Location:</p>
-      <select id="city-selector">
+    <div class="city-container mt-5">
+      <!-- <p>Location:</p> -->
+      <select id="city-selector" class="border border-black shadow-md rounded-md px-2 py-1 outline-none">
         <option value="chennai">Chennai</option>
         <option value="mumbai" selected>Mumbai</option>
         <option value="kolkata">Kolkata</option>
@@ -60,7 +61,7 @@
       </select>
     </div>
     <div
-      class="earliest-date-filter-container"
+      class="earliest-date-filter-container mt-5"
       style="
         display: flex;
         flex-direction: row;
@@ -70,15 +71,15 @@
     >
       <div class="month">
         <p>Earliest Preferred Month:</p>
-        <input type="number" id="earliest-month-input" value="3" />
+        <input type="number" id="earliest-month-input" value="3" class="shadow-md border border-black outline-none px-2 py-1 rounded-sm"/>
       </div>
       <div class="date">
         <p>Earliest Preferred Date:</p>
-        <input type="number" id="earliest-date-input" value="1" />
+        <input type="number" id="earliest-date-input" value="1" class="shadow-md border border-black outline-none px-2 py-1 rounded-sm"/>
       </div>
     </div>
     <div
-      class="last-date-filter-container"
+      class="last-date-filter-container mt-5"
       style="
         display: flex;
         flex-direction: row;
@@ -88,33 +89,33 @@
     >
       <div class="month">
         <p>Last Preferred Month:</p>
-        <input type="number" id="last-month-input" value="3" />
+        <input type="number" id="last-month-input" value="3" class="shadow-md border border-black outline-none px-2 py-1 rounded-sm" />
       </div>
       <div class="date">
         <p>Last Preferred Date:</p>
-        <input type="number" id="last-date-input" value="10" />
+        <input type="number" id="last-date-input" value="10" class="shadow-md border border-black outline-none px-2 py-1 rounded-sm" />
       </div>
     </div>
 
-    <div class="res-container">
+    <div class="res-container mt-5">
       <p>Reschedule?</p>
-      <input type="number" id="res-input" value="0" />
+      <input type="number" id="res-input" value="0" class="shadow-md border border-black outline-none px-2 py-1 rounded-sm" />
     </div>
-    <div class="sleeper-container">
+    <div class="sleeper-container mt-5">
       <p>Sleeper?</p>
-      <input type="number" id="sleeper-input" value="1" />
+      <input type="number" id="sleeper-input" value="1" class="shadow-md border border-black outline-none px-2 py-1 rounded-sm" />
     </div>
-    <div class="await-container">
+    <div class="await-container mt-5">
       <p>Await?</p>
-      <input type="number" id="await-input" value="1" />
+      <input type="number" id="await-input" value="1" class="shadow-md border border-black outline-none px-2 py-1 rounded-sm" />
     </div>
-    <div class="delay-container">
+    <div class="delay-container mt-5">
       <p>Delay Multiplier:</p>
-      <input type="number" id="delay-input" value="1" />
+      <input type="number" id="delay-input" value="1" class="shadow-md border border-black outline-none px-2 py-1 rounded-sm" />
     </div>
     <div class="submit-btn" style="margin-top: 20px">
-      <button id="start-ofc-btn">Start OFC</button>
-      <button id="start-consular-btn">Consular</button>
+      <button id="start-ofc-btn" class="btn bg-black text-white rounded-md px-2 py-1 shadow-md outline-none">Start OFC</button>
+      <button id="start-consular-btn" class="btn bg-black text-white rounded-md px-2 py-1 shadow-md outline-none">Consular</button>
     </div>
   </body>
   <script src="./popup.js"></script>
