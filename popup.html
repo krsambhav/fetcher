@@ -61,53 +61,59 @@
       </select>
     </div>
     <div
-      class="earliest-date-filter-container mt-5"
+      class="earliest-date-filter-container mt-5 gap-10"
       style="
         display: flex;
         flex-direction: row;
         justify-content: center;
-        gap: 20px;
       "
     >
       <div class="month">
-        <p>Earliest Preferred Month:</p>
+        <p>Earliest Month:</p>
         <input type="number" id="earliest-month-input" value="3" class="shadow-md border border-black outline-none px-2 py-1 rounded-sm"/>
       </div>
       <div class="date">
-        <p>Earliest Preferred Date:</p>
+        <p>Earliest Date:</p>
         <input type="number" id="earliest-date-input" value="1" class="shadow-md border border-black outline-none px-2 py-1 rounded-sm"/>
       </div>
     </div>
     <div
-      class="last-date-filter-container mt-5"
+      class="last-date-filter-container mt-5 gap-10"
       style="
         display: flex;
         flex-direction: row;
         justify-content: center;
-        gap: 20px;
       "
     >
       <div class="month">
-        <p>Last Preferred Month:</p>
+        <p>Last Month:</p>
         <input type="number" id="last-month-input" value="3" class="shadow-md border border-black outline-none px-2 py-1 rounded-sm" />
       </div>
       <div class="date">
-        <p>Last Preferred Date:</p>
+        <p>Last Date:</p>
         <input type="number" id="last-date-input" value="10" class="shadow-md border border-black outline-none px-2 py-1 rounded-sm" />
       </div>
     </div>
 
-    <div class="res-container mt-5">
-      <p>Reschedule?</p>
-      <input type="number" id="res-input" value="0" class="shadow-md border border-black outline-none px-2 py-1 rounded-sm" />
-    </div>
-    <div class="sleeper-container mt-5">
-      <p>Sleeper?</p>
-      <input type="number" id="sleeper-input" value="1" class="shadow-md border border-black outline-none px-2 py-1 rounded-sm" />
-    </div>
-    <div class="await-container mt-5">
-      <p>Await?</p>
-      <input type="number" id="await-input" value="1" class="shadow-md border border-black outline-none px-2 py-1 rounded-sm" />
+<div class="flex flex-row gap-10">
+  <div class="res-container mt-5">
+    <p>Reschedule?</p>
+    <input type="number" id="res-input" value="0" class="shadow-md border border-black outline-none px-2 py-1 rounded-sm" />
+  </div>
+  <div class="sleeper-container mt-5">
+    <p>Sleeper?</p>
+    <input type="number" id="sleeper-input" value="1" class="shadow-md border border-black outline-none px-2 py-1 rounded-sm" />
+  </div>
+</div>
+    <div class="flex flex-row gap-10">
+      <div class="await-container mt-5">
+        <p>Await?</p>
+        <input type="number" id="await-input" value="1" class="shadow-md border border-black outline-none px-2 py-1 rounded-sm" />
+      </div>
+      <div class="timeout-container mt-5">
+        <p>Timeout (Sec)?</p>
+        <input type="number" id="timeout-input" value="10" class="shadow-md border border-black outline-none px-2 py-1 rounded-sm" />
+      </div>
     </div>
     <div class="delay-container mt-5">
       <p>Delay Multiplier:</p>

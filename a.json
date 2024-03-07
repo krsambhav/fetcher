@@ -1,0 +1,30 @@
+{
+  "Members": [
+    {
+      "FullName": "Subir Kumar",
+      "ApplicationID": "2e2435b3-a5a0-ee11-a81c-001dd80395a5",
+      "VisaClassID": "1e58cbb1-a5db-ec11-a7b4-001dd802327e",
+      "VisaClassName": "B1/B2",
+      "PriorityID": "00000000-0000-0000-0000-000000000000",
+      "ContactID": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "FullName": "SUNITA DAMINI",
+      "ApplicationID": "4032ad0f-a6a0-ee11-a81c-001dd80395a5",
+      "VisaClassID": "1e58cbb1-a5db-ec11-a7b4-001dd802327e",
+      "VisaClassName": "B1/B2",
+      "PriorityID": "00000000-0000-0000-0000-000000000000",
+      "ContactID": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "LocalizedGenericErrorMessage": null,
+  "HasError": false,
+  "ErrorCount": 0,
+  "Errors": {
+    "m_MaxCapacity": 2147483647,
+    "Capacity": 16,
+    "m_StringValue": "",
+    "m_currentThread": 0
+  },
+  "ErrorString": ""
+}

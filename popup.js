@@ -108,6 +108,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   var dependentIDButton = document.getElementById("set-dependents-id-btn");
   var startOFCButton = document.getElementById("start-ofc-btn");
   var citySelector = document.getElementById("city-selector");
+  var consularOnlyButton = document.getElementById("start-consular-btn");
+  var fetchTimeout;
   var primaryName = "";
   var primaryID = "";
   var dependentsIDs = "";
@@ -118,6 +120,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   var city = "mumbai";
   var awaitChecker = "";
   var delay = 1;
+  var isConsularOnly;
   // Attach an onclick event listener to the button
   primaryIDButton.onclick = async function () {
     primaryIDAndNameDict = await fetchPrimaryID();
@@ -128,9 +131,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("primary-id-input").value = primaryID;
     document.getElementById("primary-user-name-span").innerHTML = primaryName;
   };
-  citySelector.onchange = async function() {
+  citySelector.onchange = async function () {
     city = citySelector.value;
-  }
+  };
   dependentIDButton.onclick = async function () {
     dependentsIDs = await fetchDependentIDs(primaryID);
     document.getElementById("dependents-id-input").value = dependentsIDs;
@@ -138,6 +141,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   startOFCButton.onclick = async function () {
     lastMonth = parseInt(document.getElementById("last-month-input").value);
     lastDate = parseInt(document.getElementById("last-date-input").value);
+    fetchTimeout = parseInt(document.getElementById("timeout-input").value);
     earliestMonth = parseInt(
       document.getElementById("earliest-month-input").value
     );
@@ -154,6 +158,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (awaitChecker == 0) awaitChecker = false;
     else awaitChecker = true;
     delay = parseInt(document.getElementById("delay-input").value);
+    isConsularOnly = false;
     // city = document.getElementById("city-id-input").value.toLowerCase();
     var userDetails = {
       primaryName,
@@ -168,6 +173,50 @@ document.addEventListener("DOMContentLoaded", async function () {
       isSleeper,
       awaitChecker,
       delay,
+      fetchTimeout,
+      isConsularOnly,
+    };
+    chrome.runtime.sendMessage(userDetails, function (response) {
+      console.log(response);
+    });
+  };
+  consularOnlyButton.onclick = async function () {
+    lastMonth = parseInt(document.getElementById("last-month-input").value);
+    lastDate = parseInt(document.getElementById("last-date-input").value);
+    fetchTimeout = parseInt(document.getElementById("timeout-input").value);
+    earliestMonth = parseInt(
+      document.getElementById("earliest-month-input").value
+    );
+    earliestDate = parseInt(
+      document.getElementById("earliest-date-input").value
+    );
+    isReschedule = parseInt(document.getElementById("res-input").value);
+    if (isReschedule == 0) isReschedule = "false";
+    else isReschedule = "true";
+    isSleeper = parseInt(document.getElementById("sleeper-input").value);
+    if (isSleeper == 0) isSleeper = false;
+    else isSleeper = true;
+    awaitChecker = parseInt(document.getElementById("await-input").value);
+    if (awaitChecker == 0) awaitChecker = false;
+    else awaitChecker = true;
+    delay = parseInt(document.getElementById("delay-input").value);
+    isConsularOnly = true;
+    // city = document.getElementById("city-id-input").value.toLowerCase();
+    var userDetails = {
+      primaryName,
+      primaryID,
+      dependentsIDs,
+      lastMonth,
+      lastDate,
+      earliestMonth,
+      earliestDate,
+      city,
+      isReschedule,
+      isSleeper,
+      awaitChecker,
+      delay,
+      fetchTimeout,
+      isConsularOnly,
     };
     chrome.runtime.sendMessage(userDetails, function (response) {
       console.log(response);
