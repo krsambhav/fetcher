@@ -92,7 +92,10 @@ var ofcBooked = false;
 var consularBooked = false;
 var traceValue;
 var parentValue;
+var errorCount = 0;
 var timeoutCount = 0;
+var consularErrorCount = 0;
+var consularTimeoutCount = 0;
 
 function sleep(ms) {
   clearInterval(sleepSetTimeout_ctrl);
@@ -175,7 +178,6 @@ function messageReceived(msg) {
     fetchTimeout = msg["fetchTimeout"];
     traceValue = generateRandomStringBytes(16);
   }
-
   async function demo() {
     if (isConsularOnly && !forceOFC) ofcBooked = true;
     if (serviceStarted == false) {
@@ -517,7 +519,6 @@ async function getOFCDate(city) {
   //   clearTimeout(id);
   //   return response;
   // }
-  var errorCount = 0;
   while (true) {
     try {
       // console.log(city)
@@ -564,7 +565,6 @@ async function getOFCDate(city) {
           timeout: fetchTimeout,
         }
       );
-      errorCount = 0;
       const data = await response.json();
       return data;
     } catch (error) {
@@ -586,6 +586,7 @@ async function getOFCDate(city) {
 }
 
 async function getOFCSlot(dayID, city) {
+  errorCount = 0;
   const now = Date.now(); // Unix timestamp in milliseconds
   // console.log(now);
   const response = await fetch(
@@ -670,8 +671,7 @@ async function bookOFCSlot(city, dayID, slotID) {
 }
 
 async function getConsularDates(consularLocation) {
-  var consularErrorCount = 0;
-  var consularTimeoutCount = 0;
+
   while (true) {
     try {
       const now = Date.now(); // Unix timestamp in milliseconds
