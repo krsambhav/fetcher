@@ -425,6 +425,7 @@ async function startOFC(city) {
       console.log("Booking OFC");
       if (ofcBookingResponse["AllScheduled"] == true) {
         ofcBooked = true;
+        sleeper = false;
         sendCustomMsg(
           `OFC Booked For ${capitalizeFirstLetter(
             city
@@ -446,17 +447,23 @@ async function startOFC(city) {
 }
 
 async function startConsular(city) {
-  var consularDatesResponse = await getConsularDates(city);
-  // console.log(consularDatesResponse)
-  var consularDates = consularDatesResponse["ScheduleDays"];
-  var latestConsularDateID;
-  var latestConsularDate;
-  if (consularDates.length > 0) {
-    latestConsularDateID = consularDates[0]["ID"];
-    latestConsularDate = consularDates[0]["Date"];
-  } else {
-    console.log("No Consular Date Found");
-    return 0;
+  try {
+    var consularDatesResponse = await getConsularDates(city);
+    // console.log(consularDatesResponse)
+    var consularDates = consularDatesResponse["ScheduleDays"];
+    var latestConsularDateID;
+    var latestConsularDate;
+    if (consularDates.length > 0) {
+      latestConsularDateID = consularDates[0]["ID"];
+      latestConsularDate = consularDates[0]["Date"];
+    } else {
+      console.log("No Consular Date Found");
+      return 0;
+    }
+  } catch (error) {
+    sendCustomMsg(
+      `Consular Reading Failed For ${primaryName}, Process Stopped.`
+    );
   }
   // console.log(consularDates)
   var { day, month, year } = formatRawDate(latestConsularDate);
