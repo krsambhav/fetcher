@@ -429,9 +429,9 @@ async function startOFC(city) {
         ofcBooked = true;
         sleeper = false;
         sendCustomMsg(
-          `OFC Booked For ${capitalizeFirstLetter(
+          `OFC | ${capitalizeFirstLetter(
             city
-          )} On ${day}/${month}/${year} For ${primaryName}`
+          )} | ${day}/${month} | ${primaryName}`
         );
         console.log(
           `OFC Booked For ${capitalizeFirstLetter(
@@ -492,9 +492,9 @@ async function startConsular(city) {
   if (consularBookingResponse["AllScheduled"] == true) {
     consularBooked = true;
     sendCustomMsg(
-      `Consular Booked For ${capitalizeFirstLetter(
+      `Consular | ${capitalizeFirstLetter(
         city
-      )} On ${day}/${month}/${year} For ${primaryName}`
+      )} | ${day}/${month} | ${primaryName}`
     );
     console.log(
       `Consular Booked For ${capitalizeFirstLetter(
