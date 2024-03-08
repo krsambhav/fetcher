@@ -177,6 +177,8 @@ function messageReceived(msg) {
     delay = msg["delay"];
     fetchTimeout = msg["fetchTimeout"];
     traceValue = generateRandomStringBytes(16);
+  } else {
+    sleeper = msg["isSleeper"];
   }
   async function demo() {
     if (isConsularOnly && !forceOFC) ofcBooked = true;
@@ -431,12 +433,16 @@ async function startOFC(city) {
         sendCustomMsg(
           `OFC | ${capitalizeFirstLetter(
             city
-          )} | ${day}/${month} | ${primaryName}`
+          )} | ${day}/${month} | ${primaryName} | ${
+            applicationIDs.length == 0 ? 1 : applicationIDs.length
+          } Pax`
         );
         console.log(
           `OFC Booked For ${capitalizeFirstLetter(
             city
-          )} On ${day}/${month}/${year} For ${primaryName}`
+          )} On ${day}/${month}/${year} For ${primaryName} | ${
+            applicationIDs.length == 0 ? 1 : applicationIDs.length
+          } Pax`
         );
         return 1;
       } else {
@@ -466,6 +472,9 @@ async function startConsular(city) {
     sendCustomMsg(
       `Consular Reading Failed For ${primaryName}, Process Stopped.`
     );
+    ofcBooked = false;
+    forceOFC = true;
+    messageReceived();
   }
   // console.log(consularDates)
   var { day, month, year } = formatRawDate(latestConsularDate);
@@ -570,7 +579,8 @@ async function getOFCDate(city) {
     } catch (error) {
       if (error.name === "AbortError") {
         timeoutCount++;
-        console.log(`Timeout Exception. Count: ${timeoutCount}`);
+        if (timeoutCount % 10 == 1)
+          console.log(`Timeout Exception. Count: ${timeoutCount}`);
       } else if (errorCount > 10) {
         errorCount++;
         sendCustomMsg(`Error Count Exceeded For ${primaryName}`);
@@ -580,7 +590,7 @@ async function getOFCDate(city) {
         // console.log('Error In Getting OFC Date!')
         errorCount++;
       }
-      console.log("Exception!");
+      if (error.name !== "AbortError") console.log("Exception!");
       continue;
     }
   }
@@ -672,7 +682,6 @@ async function bookOFCSlot(city, dayID, slotID) {
 }
 
 async function getConsularDates(consularLocation) {
-
   while (true) {
     try {
       const now = Date.now(); // Unix timestamp in milliseconds
