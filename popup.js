@@ -71,14 +71,14 @@ async function fetchPrimaryID() {
   }
 }
 
-async function fetchDependentIDs(primaryID, isRes) {
+async function fetchDependentIDs(primaryID, isReschedule) {
   const now = Date.now();
   var url = `https://www.usvisascheduling.com/en-US/custom-actions/?route=/api/v1/schedule-group/query-family-members-ofc&cacheString=${now}`;
-  if (isRes == true) {
+  if (isReschedule == "true") {
     url = `https://www.usvisascheduling.com/en-US/custom-actions/?route=/api/v1/schedule-group/query-family-members-ofc-reschedule&cacheString=${now}`;
   }
   var dependentDataResponse = await fetch(
-    "https://www.usvisascheduling.com/en-US/custom-actions/?route=/api/v1/schedule-group/query-family-members-ofc&cacheString=1709471478212",
+    url,
     {
       headers: {
         accept: "application/json, text/javascript, */*; q=0.01",
@@ -158,12 +158,11 @@ document.addEventListener("DOMContentLoaded", async function () {
   };
   dependentIDButton.onclick = async function () {
     isReschedule = parseInt(document.getElementById("res-input").value);
-    console.log(isReschedule)
     if (isReschedule == 0) isReschedule = "false";
     else isReschedule = "true";
     dependentsIDs = await fetchDependentIDs(
       primaryID,
-      isReschedule == "true" ? true : false
+      isReschedule
     );
     document.getElementById("dependents-id-input").value = dependentsIDs;
   };
