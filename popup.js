@@ -74,7 +74,7 @@ async function fetchPrimaryID() {
 async function fetchDependentIDs(primaryID) {
   const now = Date.now();
   var url = `https://www.usvisascheduling.com/en-US/custom-actions/?route=/api/v1/schedule-group/query-family-members-ofc&cacheString=${now}`;
-  if (isReschedule) url = `https://www.usvisascheduling.com/en-US/custom-actions/?route=/api/v1/schedule-group/query-family-members-ofc-reschedule&${now}`
+  if (isReschedule == "true") url = `https://www.usvisascheduling.com/en-US/custom-actions/?route=/api/v1/schedule-group/query-family-members-ofc-reschedule&${now}`
   var dependentDataResponse = await fetch(
     "https://www.usvisascheduling.com/en-US/custom-actions/?route=/api/v1/schedule-group/query-family-members-ofc&cacheString=1709471478212",
     {
