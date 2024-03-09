@@ -1,3 +1,20 @@
+var traceValue = generateRandomStringBytes(16);
+var parentValue = generateRandomStringBytes(8);
+
+function generateRandomStringBytes(size) {
+  let id = "";
+  for (let i = 0; i < size; i++) {
+    id += ("00" + Math.floor(Math.random() * 256).toString(16)).slice(-2);
+  }
+  return id;
+}
+function generateTranceparent() {
+  return `00-${traceValue}-${parentValue}-01`;
+}
+
+function generateRequestID() {
+  return `|${traceValue}.${parentValue}`;
+}
 async function fetchPrimaryID() {
   var homePageResponse = await fetch(
     "https://www.usvisascheduling.com/en-US/",
@@ -6,7 +23,7 @@ async function fetchPrimaryID() {
         accept: "application/json, text/javascript, */*; q=0.01",
         "accept-language": "en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7",
         "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "request-id": "|842175736d9142f9a85f1ff42da7d436.a070021da15f42d8",
+        "request-id": generateRequestID(),
         "sec-ch-ua":
           '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
         "sec-ch-ua-arch": '"arm"',
@@ -21,7 +38,7 @@ async function fetchPrimaryID() {
         "sec-fetch-dest": "empty",
         "sec-fetch-mode": "cors",
         "sec-fetch-site": "same-origin",
-        traceparent: "00-842175736d9142f9a85f1ff42da7d436-a070021da15f42d8-01",
+        traceparent: generateTranceparent(),
         "x-requested-with": "XMLHttpRequest",
       },
       referrer:
@@ -55,6 +72,9 @@ async function fetchPrimaryID() {
 }
 
 async function fetchDependentIDs(primaryID) {
+  const now = Date.now();
+  var url = `https://www.usvisascheduling.com/en-US/custom-actions/?route=/api/v1/schedule-group/query-family-members-ofc&cacheString=${now}`;
+  if (isReschedule) url = `https://www.usvisascheduling.com/en-US/custom-actions/?route=/api/v1/schedule-group/query-family-members-ofc-reschedule&${now}`
   var dependentDataResponse = await fetch(
     "https://www.usvisascheduling.com/en-US/custom-actions/?route=/api/v1/schedule-group/query-family-members-ofc&cacheString=1709471478212",
     {
@@ -135,6 +155,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     city = citySelector.value;
   };
   dependentIDButton.onclick = async function () {
+    isReschedule = parseInt(document.getElementById("res-input").value);
+    if (isReschedule == 0) isReschedule = "false";
+    else isReschedule = "true";
     dependentsIDs = await fetchDependentIDs(primaryID);
     document.getElementById("dependents-id-input").value = dependentsIDs;
   };
