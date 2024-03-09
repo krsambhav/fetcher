@@ -158,9 +158,13 @@ document.addEventListener("DOMContentLoaded", async function () {
   };
   dependentIDButton.onclick = async function () {
     isReschedule = parseInt(document.getElementById("res-input").value);
+    console.log(isReschedule)
     if (isReschedule == 0) isReschedule = "false";
     else isReschedule = "true";
-    dependentsIDs = await fetchDependentIDs(primaryID, isReschedule == "true" ? true : false);
+    dependentsIDs = await fetchDependentIDs(
+      primaryID,
+      isReschedule == "true" ? true : false
+    );
     document.getElementById("dependents-id-input").value = dependentsIDs;
   };
   startOFCButton.onclick = async function () {
