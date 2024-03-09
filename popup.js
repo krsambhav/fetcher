@@ -84,7 +84,7 @@ async function fetchDependentIDs(primaryID, isReschedule) {
         accept: "application/json, text/javascript, */*; q=0.01",
         "accept-language": "en-US,en;q=0.8",
         "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "request-id": "|bb46face25604308b98b4239971a441c.411caf16b21349cb",
+        "request-id": generateRequestID(),
         "sec-ch-ua":
           '"Chromium";v="122", "Not(A:Brand";v="24", "Brave";v="122"',
         "sec-ch-ua-mobile": "?0",
@@ -95,7 +95,7 @@ async function fetchDependentIDs(primaryID, isReschedule) {
         "sec-fetch-mode": "cors",
         "sec-fetch-site": "same-origin",
         "sec-gpc": "1",
-        traceparent: "00-bb46face25604308b98b4239971a441c-411caf16b21349cb-01",
+        traceparent: generateTranceparent(),
         "x-requested-with": "XMLHttpRequest",
       },
       referrer: "https://www.usvisascheduling.com/en-US/ofc-schedule/",
