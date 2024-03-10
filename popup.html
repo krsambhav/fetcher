@@ -22,8 +22,12 @@
       align-items: center;
       flex-wrap: wrap;
     "
+    class="font-bold"
   >
-    <div class="primary-name-container" style="margin-top: 20px">
+    <div class="country-name-container" style="margin-top: 20px">
+      <span>India</span><span id="country-name"></span>
+    </div>
+    <div class="primary-name-container" style="margin-top: 5px">
       <span>User: </span><span id="primary-user-name-span"></span>
     </div>
     <div
@@ -71,12 +75,12 @@
       <input type="text" id="city-id-input" />
     </div> -->
     <div class="city-container mt-5 flex flex-row gap-5">
-      <button
+      <!-- <button
         id="check-res-btn"
         class="btn bg-black text-white rounded-md px-2 py-1 shadow-md outline-none"
       >
         Check Reschedule
-      </button>
+      </button> -->
       <!-- <p>Location:</p> -->
       <select
         id="city-selector"
@@ -185,12 +189,24 @@
         class="shadow-md border border-black outline-none px-2 py-1 rounded-sm"
       />
     </div>
-    <div class="submit-btn" style="margin-top: 20px">
+    <div class="fill-btn" style="margin-top: 20px">
+      <button
+        id="fill-btn"
+        class="btn bg-black text-white rounded-md px-2 py-1 shadow-md outline-none"
+      >
+        Fill
+      </button>
+      <button
+        id="start-btn"
+        class="btn bg-black text-white rounded-md px-2 py-1 shadow-md outline-none"
+      >
+        Start OFC & Consular
+      </button>
       <button
         id="start-ofc-btn"
         class="btn bg-black text-white rounded-md px-2 py-1 shadow-md outline-none"
       >
-        Start OFC
+        OFC
       </button>
       <button
         id="start-consular-btn"

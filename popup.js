@@ -76,9 +76,13 @@ async function checkReschedule() {
     "https://www.usvisascheduling.com/en-US/appointment-confirmation/"
   );
   var text = await data.text();
-  var ofcCount = text.match(/OFC APPOINTMENT DETAILS/g).length;
-  if (ofcCount == 0) return false;
-  else return true;
+  try {
+    var ofcCount = text.match(/OFC APPOINTMENT DETAILS/g).length;
+    if (ofcCount == 0) return false;
+    else return true;
+  } catch (error) {
+    return false;
+  }
 }
 
 async function fetchDependentIDs(primaryID, isReschedule) {
@@ -132,12 +136,14 @@ function fillInput() {
 
 document.addEventListener("DOMContentLoaded", async function () {
   // Find the button by its ID
+  var fillButton = document.getElementById("fill-btn");
   var primaryIDButton = document.getElementById("set-primary-id-btn");
   var dependentIDButton = document.getElementById("set-dependents-id-btn");
-  var startOFCButton = document.getElementById("start-ofc-btn");
-  var citySelector = document.getElementById("city-selector");
+  var startAllButton = document.getElementById("start-btn");
+  var OFCOnlyButton = document.getElementById("start-ofc-btn");
   var consularOnlyButton = document.getElementById("start-consular-btn");
-  var checkRescheduleButton = document.getElementById("check-res-btn");
+  var citySelector = document.getElementById("city-selector");
+  // var checkRescheduleButton = document.getElementById("check-res-btn");
   var fetchTimeout;
   var primaryName = "";
   var primaryID = "";
@@ -150,8 +156,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   var awaitChecker = "";
   var delay = 1;
   var isConsularOnly;
-  // Attach an onclick event listener to the button
-  primaryIDButton.onclick = async function () {
+  var isOFCOnly;
+
+  async function handlePrimaryButtonClick() {
     primaryIDAndNameDict = await fetchPrimaryID();
     primaryName = primaryIDAndNameDict["primaryName"];
     primaryID = primaryIDAndNameDict["primaryID"];
@@ -159,23 +166,79 @@ document.addEventListener("DOMContentLoaded", async function () {
     // console.log(primaryName)
     document.getElementById("primary-id-input").value = primaryID;
     document.getElementById("primary-user-name-span").innerHTML = primaryName;
-  };
-  citySelector.onchange = async function () {
-    city = citySelector.value;
-  };
-  checkRescheduleButton.onclick = async function () {
+  }
+  async function handleCheckRescheduleButtonClick() {
     var applicationIsReschedule = await checkReschedule();
     if (applicationIsReschedule) document.getElementById("res-input").value = 1;
     else document.getElementById("res-input").value = 0;
-  };
-  dependentIDButton.onclick = async function () {
+  }
+  async function handleDependentButtonClick() {
     isReschedule = parseInt(document.getElementById("res-input").value);
     if (isReschedule == 0) isReschedule = "false";
     else isReschedule = "true";
     dependentsIDs = await fetchDependentIDs(primaryID, isReschedule);
     document.getElementById("dependents-id-input").value = dependentsIDs;
+  }
+  // Attach an onclick event listener to the button
+  fillButton.onclick = async function () {
+    await handlePrimaryButtonClick();
+    await handleCheckRescheduleButtonClick();
+    await handleDependentButtonClick();
+    // await handleCheckRescheduleButtonClick();
+    // await handleDependentButtonClick();
   };
-  startOFCButton.onclick = async function () {
+  primaryIDButton.onclick = handlePrimaryButtonClick;
+  citySelector.onchange = async function () {
+    city = citySelector.value;
+  };
+  // checkRescheduleButton.onclick = handleCheckRescheduleButtonClick;
+  dependentIDButton.onclick = handleDependentButtonClick;
+  OFCOnlyButton.onclick = async function () {
+    lastMonth = parseInt(document.getElementById("last-month-input").value);
+    lastDate = parseInt(document.getElementById("last-date-input").value);
+    fetchTimeout = parseInt(document.getElementById("timeout-input").value);
+    earliestMonth = parseInt(
+      document.getElementById("earliest-month-input").value
+    );
+    earliestDate = parseInt(
+      document.getElementById("earliest-date-input").value
+    );
+    isReschedule = parseInt(document.getElementById("res-input").value);
+    if (isReschedule == 0) isReschedule = "false";
+    else isReschedule = "true";
+    isSleeper = parseInt(document.getElementById("sleeper-input").value);
+    if (isSleeper == 0) isSleeper = false;
+    else isSleeper = true;
+    awaitChecker = parseInt(document.getElementById("await-input").value);
+    if (awaitChecker == 0) awaitChecker = false;
+    else awaitChecker = true;
+    delay = parseInt(document.getElementById("delay-input").value);
+    isOFCOnly = true;
+    isConsularOnly = false;
+    // city = document.getElementById("city-id-input").value.toLowerCase();
+    var userDetails = {
+      primaryName,
+      primaryID,
+      dependentsIDs,
+      lastMonth,
+      lastDate,
+      earliestMonth,
+      earliestDate,
+      city,
+      isReschedule,
+      isSleeper,
+      awaitChecker,
+      delay,
+      fetchTimeout,
+      isOFCOnly,
+      isConsularOnly,
+    };
+    chrome.runtime.sendMessage(userDetails, function (response) {
+      console.log(response);
+    });
+  };
+  startAllButton.onclick = async function () {
+    console.log('OK')
     lastMonth = parseInt(document.getElementById("last-month-input").value);
     lastDate = parseInt(document.getElementById("last-date-input").value);
     fetchTimeout = parseInt(document.getElementById("timeout-input").value);
@@ -196,6 +259,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     else awaitChecker = true;
     delay = parseInt(document.getElementById("delay-input").value);
     isConsularOnly = false;
+    isOFCOnly = false;
     // city = document.getElementById("city-id-input").value.toLowerCase();
     var userDetails = {
       primaryName,
@@ -211,6 +275,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       awaitChecker,
       delay,
       fetchTimeout,
+      isOFCOnly,
       isConsularOnly,
     };
     chrome.runtime.sendMessage(userDetails, function (response) {
@@ -238,6 +303,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     else awaitChecker = true;
     delay = parseInt(document.getElementById("delay-input").value);
     isConsularOnly = true;
+    isOFCOnly = false;
     // city = document.getElementById("city-id-input").value.toLowerCase();
     var userDetails = {
       primaryName,
@@ -253,6 +319,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       awaitChecker,
       delay,
       fetchTimeout,
+      isOFCOnly,
       isConsularOnly,
     };
     chrome.runtime.sendMessage(userDetails, function (response) {

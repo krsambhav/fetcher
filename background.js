@@ -82,6 +82,7 @@ var earliestDate;
 var awaitChecker = false;
 var delay;
 var fetchTimeout;
+var isOFCOnly;
 var isConsularOnly;
 var forceOFC = false;
 
@@ -159,6 +160,7 @@ function messageReceived(msg) {
   if (!forceOFC) {
     primaryName = msg["primaryName"];
     primaryID = msg["primaryID"];
+    isOFCOnly = msg["isOFCOnly"];
     isConsularOnly = msg["isConsularOnly"];
     if (msg["dependentsIDs"] === primaryID) {
       applicationIDs = [];
@@ -330,6 +332,19 @@ function formatRawDate(rawDate) {
   return finalDateJSON;
 }
 
+function formatRawDateArr(rawDateArr) {
+  var formattedDatesArr = [];
+  for (let index = 0; index < rawDateArr.length; index++) {
+    // console.log(rawDateArr[index])
+    var rawDate = rawDateArr[index]["Date"];
+    var formattedDateJSON = formatRawDate(rawDate);
+    formattedDateJSON["dayID"] = rawDateArr[index]["ID"];
+    // console.log(formattedDateJSON)
+    formattedDatesArr.push(formattedDateJSON);
+  }
+  return formattedDatesArr;
+}
+
 async function startService() {
   // console.log("Fetching");
   // sendCustomMsg('Hello Sam, Slots Booked')
@@ -349,6 +364,7 @@ async function startService() {
       return "ECE";
     }
     if (ofcBookingBinaryResponse == 1) {
+      if (isOFCOnly) return 1;
       var consularBookingBinaryResponse = await startConsular(city);
       if (consularBookingBinaryResponse == 1) {
         return 1;
@@ -379,75 +395,103 @@ async function startOFC(city) {
   // console.log(ofcDateResponse);
   var ofcDatesArr = ofcDateResponse["ScheduleDays"];
   // console.log(jsonDates);
-  var latestOFCDate;
-  if (ofcDatesArr.length > 0) {
-    latestOFCDate = ofcDatesArr[0]["Date"];
+  // var latestOFCDate;
+  var latestOFCDatesArr;
+  // if (ofcDatesArr.length > 0) {
+  //   latestOFCDate = ofcDatesArr[0]["Date"];
+  // } else {
+  //   console.log("No Dates Found!");
+  //   return 0;
+  // }
+  if (ofcDatesArr.length > 31) {
+    latestOFCDatesArr = ofcDatesArr.slice(0, 30);
+  } else if (ofcDatesArr.length != 0) {
+    latestOFCDatesArr = ofcDatesArr;
   } else {
     console.log("No Dates Found!");
     return 0;
   }
-  var dayID = ofcDatesArr[0]["ID"];
-  var { day, month, year } = formatRawDate(latestOFCDate);
-  console.log(
-    `Latest Slot Date: ${day} ${monthNames[month - 1]["abbreviation"]} ${year}`
-  );
+  var formattedDatesArr = formatRawDateArr(latestOFCDatesArr);
+  // var dayID = ofcDatesArr[0]["ID"];
+  // var dayID;
+  // var { day, month, year } = formatRawDate(latestOFCDate);
+  // console.log(
+  //   `Latest Slot Date: ${day} ${monthNames[month - 1]["abbreviation"]} ${year}`
+  // );
+  // console.log(formattedDatesArr);
   // console.log(
   //   `${city} | ${lastDate} | ${lastMonth} | ${primaryID} | ${applicationIDs}`
   // );
-  if (year == 2024) {
-    //suck fuck
-    if (
-      (earliestMonth == lastMonth &&
-        day >= earliestDate &&
-        day <= lastDate &&
-        earliestMonth == month) ||
-      (month == lastMonth && day <= lastDate && month != earliestMonth) ||
-      (month == earliestMonth && day >= earliestDate && month != lastMonth) ||
-      (month > earliestMonth && month < lastMonth)
-    ) {
-      const ofcSlotResponse = await getOFCSlot(dayID, city);
-      var ofcSlotResponseSlots;
-      if (ofcSlotResponse["ScheduleEntries"].length > 0) {
-        ofcSlotResponseSlots = await ofcSlotResponse["ScheduleEntries"][0];
-      } else {
-        console.log("No Slot Timing Found!");
+  for (let index = 0; index < formattedDatesArr.length; index++) {
+    var { day, month, year, dayID } = formattedDatesArr[index];
+    if (index == 0) {
+      console.log(
+        `Latest Slot Date: ${day} ${
+          monthNames[month - 1]["abbreviation"]
+        } ${year}`
+      );
+      if (year != 2024) {
+        return 0;
+      } else if (year == 2024 && month > lastMonth) {
         return 0;
       }
-      var latestAvailableSlotTimeID = await ofcSlotResponse[
-        "ScheduleEntries"
-      ][0]["ID"];
-      var latestAvailableSlotTime = await ofcSlotResponse["ScheduleEntries"][0][
-        "Time"
-      ];
-      console.log(`Latest Slot Time: ${latestAvailableSlotTime}`);
-      ofcBookingResponse = await bookOFCSlot(
-        city,
-        dayID,
-        latestAvailableSlotTimeID
-      );
-      console.log(ofcBookingResponse);
-      console.log("Booking OFC");
-      if (ofcBookingResponse["AllScheduled"] == true) {
-        ofcBooked = true;
-        sleeper = false;
-        sendCustomMsg(
-          `OFC | ${capitalizeFirstLetter(
-            city
-          )} | ${day}/${month} | ${primaryName} | ${
-            applicationIDs.length == 0 ? 1 : applicationIDs.length
-          } Pax`
-        );
-        console.log(
-          `OFC Booked For ${capitalizeFirstLetter(
-            city
-          )} On ${day}/${month}/${year} For ${primaryName} | ${
-            applicationIDs.length == 0 ? 1 : applicationIDs.length
-          } Pax`
-        );
-        return 1;
-      } else {
-        console.log("OFC Booking Error");
-        sendCustomMsg(`OFC Error For ${primaryName}`);
+    }
+    if (year == 2024) {
+      //suck fuck
+      if (
+        (earliestMonth == lastMonth &&
+          day >= earliestDate &&
+          day <= lastDate &&
+          earliestMonth == month) ||
+        (month == lastMonth && day <= lastDate && month != earliestMonth) ||
+        (month == earliestMonth && day >= earliestDate && month != lastMonth) ||
+        (month > earliestMonth && month < lastMonth)
+      ) {
+        // console.log(formattedDatesArr[index]);
+        const ofcSlotResponse = await getOFCSlot(dayID, city);
+        var ofcSlotResponseSlots;
+        if (ofcSlotResponse["ScheduleEntries"].length > 0) {
+          ofcSlotResponseSlots = await ofcSlotResponse["ScheduleEntries"][0];
+        } else {
+          console.log("No Slot Timing Found!");
+          return 0;
+        }
+        var latestAvailableSlotTimeID = await ofcSlotResponse[
+          "ScheduleEntries"
+        ][0]["ID"];
+        var latestAvailableSlotTime = await ofcSlotResponse[
+          "ScheduleEntries"
+        ][0]["Time"];
+        console.log(`Latest Slot Time: ${latestAvailableSlotTime}`);
+        // ofcBookingResponse = await bookOFCSlot(
+        //   city,
+        //   dayID,
+        //   latestAvailableSlotTimeID
+        // );
+        console.log(ofcBookingResponse);
+        console.log("Booking OFC");
+        if (ofcBookingResponse["AllScheduled"] == true) {
+          ofcBooked = true;
+          sleeper = false;
+          sendCustomMsg(
+            `OFC | ${capitalizeFirstLetter(
+              city
+            )} | ${day}/${month} | ${primaryName} | ${
+              applicationIDs.length == 0 ? 1 : applicationIDs.length
+            } Pax`
+          );
+          console.log(
+            `OFC Booked For ${capitalizeFirstLetter(
+              city
+            )} On ${day}/${month}/${year} For ${primaryName} | ${
+              applicationIDs.length == 0 ? 1 : applicationIDs.length
+            } Pax`
+          );
+          return 1;
+        } else {
+          console.log("OFC Booking Error");
+          sendCustomMsg(`OFC Error For ${primaryName}`);
+        }
       }
     }
   }
