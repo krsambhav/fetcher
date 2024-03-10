@@ -71,41 +71,47 @@ async function fetchPrimaryID() {
   }
 }
 
+async function checkReschedule() {
+  var data = await fetch(
+    "https://www.usvisascheduling.com/en-US/appointment-confirmation/"
+  );
+  var text = await data.text();
+  var ofcCount = text.match(/OFC APPOINTMENT DETAILS/g).length;
+  if (ofcCount == 0) return false;
+  else return true;
+}
+
 async function fetchDependentIDs(primaryID, isReschedule) {
   const now = Date.now();
   var url = `https://www.usvisascheduling.com/en-US/custom-actions/?route=/api/v1/schedule-group/query-family-members-ofc&cacheString=${now}`;
   if (isReschedule == "true") {
     url = `https://www.usvisascheduling.com/en-US/custom-actions/?route=/api/v1/schedule-group/query-family-members-ofc-reschedule&cacheString=${now}`;
   }
-  var dependentDataResponse = await fetch(
-    url,
-    {
-      headers: {
-        accept: "application/json, text/javascript, */*; q=0.01",
-        "accept-language": "en-US,en;q=0.8",
-        "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "request-id": generateRequestID(),
-        "sec-ch-ua":
-          '"Chromium";v="122", "Not(A:Brand";v="24", "Brave";v="122"',
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-model": '""',
-        "sec-ch-ua-platform": '"Linux"',
-        "sec-ch-ua-platform-version": '"5.15.0"',
-        "sec-fetch-dest": "empty",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-site": "same-origin",
-        "sec-gpc": "1",
-        traceparent: generateTranceparent(),
-        "x-requested-with": "XMLHttpRequest",
-      },
-      referrer: "https://www.usvisascheduling.com/en-US/ofc-schedule/",
-      referrerPolicy: "strict-origin-when-cross-origin",
-      body: `parameters={"primaryId":"${primaryID}","visaClass":"all"}`,
-      method: "POST",
-      mode: "cors",
-      credentials: "include",
-    }
-  );
+  var dependentDataResponse = await fetch(url, {
+    headers: {
+      accept: "application/json, text/javascript, */*; q=0.01",
+      "accept-language": "en-US,en;q=0.8",
+      "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+      "request-id": generateRequestID(),
+      "sec-ch-ua": '"Chromium";v="122", "Not(A:Brand";v="24", "Brave";v="122"',
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-model": '""',
+      "sec-ch-ua-platform": '"Linux"',
+      "sec-ch-ua-platform-version": '"5.15.0"',
+      "sec-fetch-dest": "empty",
+      "sec-fetch-mode": "cors",
+      "sec-fetch-site": "same-origin",
+      "sec-gpc": "1",
+      traceparent: generateTranceparent(),
+      "x-requested-with": "XMLHttpRequest",
+    },
+    referrer: "https://www.usvisascheduling.com/en-US/ofc-schedule/",
+    referrerPolicy: "strict-origin-when-cross-origin",
+    body: `parameters={"primaryId":"${primaryID}","visaClass":"all"}`,
+    method: "POST",
+    mode: "cors",
+    credentials: "include",
+  });
   var familyData = await dependentDataResponse.json();
   var membersArr = familyData["Members"];
   var dependentIDsArr = [];
@@ -131,6 +137,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   var startOFCButton = document.getElementById("start-ofc-btn");
   var citySelector = document.getElementById("city-selector");
   var consularOnlyButton = document.getElementById("start-consular-btn");
+  var checkRescheduleButton = document.getElementById("check-res-btn");
   var fetchTimeout;
   var primaryName = "";
   var primaryID = "";
@@ -156,14 +163,16 @@ document.addEventListener("DOMContentLoaded", async function () {
   citySelector.onchange = async function () {
     city = citySelector.value;
   };
+  checkRescheduleButton.onclick = async function () {
+    var applicationIsReschedule = await checkReschedule();
+    if (applicationIsReschedule) document.getElementById("res-input").value = 1;
+    else document.getElementById("res-input").value = 0;
+  };
   dependentIDButton.onclick = async function () {
     isReschedule = parseInt(document.getElementById("res-input").value);
     if (isReschedule == 0) isReschedule = "false";
     else isReschedule = "true";
-    dependentsIDs = await fetchDependentIDs(
-      primaryID,
-      isReschedule
-    );
+    dependentsIDs = await fetchDependentIDs(primaryID, isReschedule);
     document.getElementById("dependents-id-input").value = dependentsIDs;
   };
   startOFCButton.onclick = async function () {
