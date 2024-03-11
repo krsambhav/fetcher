@@ -463,11 +463,11 @@ async function startOFC(city) {
           "ScheduleEntries"
         ][0]["Time"];
         console.log(`Latest Slot Time: ${latestAvailableSlotTime}`);
-        // ofcBookingResponse = await bookOFCSlot(
-        //   city,
-        //   dayID,
-        //   latestAvailableSlotTimeID
-        // );
+        ofcBookingResponse = await bookOFCSlot(
+          city,
+          dayID,
+          latestAvailableSlotTimeID
+        );
         console.log(ofcBookingResponse);
         console.log("Booking OFC");
         if (ofcBookingResponse["AllScheduled"] == true) {
