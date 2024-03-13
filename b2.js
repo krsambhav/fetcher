@@ -351,7 +351,7 @@ function getEligibleDates(formattedDatesArr) {
     var day = formattedDatesArr[index]["day"];
     var month = formattedDatesArr[index]["month"];
     var year = formattedDatesArr[index]["year"];
-    if (year == 2024) {
+    if (year == 2025) {
       if (
         (earliestMonth == lastMonth &&
           day >= earliestDate &&
@@ -430,13 +430,12 @@ async function startOFC(city) {
   console.log(
     `Latest Slot Date: ${day} ${monthNames[month - 1]["abbreviation"]} ${year}`
   );
-  if (year != 2024) {
+  if (year != 2025) {
     return 0;
-  } else if (year == 2024 && month > lastMonth) {
+  } else if (year == 2025 && month > lastMonth) {
     return 0;
   }
   var eligibleDatesArr = getEligibleDates(formattedDatesArr);
-  console.log(eligibleDatesArr)
   if (eligibleDatesArr.length == 0) {
     console.log("No Eligible Dates");
     return 0;
@@ -451,7 +450,7 @@ async function startOFC(city) {
     year = eligibleDatesArr[1]["year"];
     dayID = eligibleDatesArr[1]["dayID"];
   }
-  // console.log(day, month, year, dayID);
+  // console.log(formattedDatesArr[index]);
   const ofcSlotResponse = await getOFCSlot(dayID, city);
   var ofcSlotResponseSlots;
   if (ofcSlotResponse["ScheduleEntries"].length > 1) {
@@ -469,11 +468,11 @@ async function startOFC(city) {
     "Time"
   ];
   console.log(`Latest Slot Time: ${latestAvailableSlotTime}`);
-  ofcBookingResponse = await bookOFCSlot(
-    city,
-    dayID,
-    latestAvailableSlotTimeID
-  );
+  // ofcBookingResponse = await bookOFCSlot(
+  //   city,
+  //   dayID,
+  //   latestAvailableSlotTimeID
+  // );
   console.log(ofcBookingResponse);
   console.log("Booking OFC");
   if (ofcBookingResponse["AllScheduled"] == true) {
