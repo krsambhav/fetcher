@@ -436,7 +436,7 @@ async function startOFC(city) {
     return 0;
   }
   var eligibleDatesArr = getEligibleDates(formattedDatesArr);
-  console.log(eligibleDatesArr)
+  console.log(eligibleDatesArr);
   if (eligibleDatesArr.length == 0) {
     console.log("No Eligible Dates");
     return 0;
@@ -462,12 +462,8 @@ async function startOFC(city) {
     console.log("No Slot Timing Found!");
     return 0;
   }
-  var latestAvailableSlotTimeID = await ofcSlotResponse["ScheduleEntries"][0][
-    "ID"
-  ];
-  var latestAvailableSlotTime = await ofcSlotResponse["ScheduleEntries"][0][
-    "Time"
-  ];
+  var latestAvailableSlotTimeID = await ofcSlotResponseSlots["ID"];
+  var latestAvailableSlotTime = await ofcSlotResponseSlots["Time"];
   console.log(`Latest Slot Time: ${latestAvailableSlotTime}`);
   ofcBookingResponse = await bookOFCSlot(
     city,
@@ -831,41 +827,38 @@ async function bookConsularSlot(consularLocation, dayID, slotID) {
   if (isRes == "true") {
     url = `https://www.usvisascheduling.com/en-US/custom-actions/?route=/api/v1/schedule-group/reschedule-consular-appointments-for-family&cacheString=${now}`;
   }
-  const response = await fetch(
-    `https://www.usvisascheduling.com/en-US/custom-actions/?route=/api/v1/schedule-group/schedule-consular-appointments-for-family&cacheString=${now}`,
-    {
-      headers: {
-        accept: "application/json, text/javascript, */*; q=0.01",
-        "accept-language": "en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7",
-        "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "request-id": generateRequestID(),
-        "sec-ch-ua":
-          '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
-        "sec-ch-ua-arch": '"arm"',
-        "sec-ch-ua-bitness": '"64"',
-        "sec-ch-ua-full-version": '"122.0.6261.69"',
-        "sec-ch-ua-full-version-list":
-          '"Chromium";v="122.0.6261.69", "Not(A:Brand";v="24.0.0.0", "Google Chrome";v="122.0.6261.69"',
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-model": '""',
-        "sec-ch-ua-platform": '"macOS"',
-        "sec-ch-ua-platform-version": '"14.3.1"',
-        "sec-fetch-dest": "empty",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-site": "same-origin",
-        traceparent: generateTranceparent(),
-        "x-requested-with": "XMLHttpRequest",
-      },
-      referrer: "https://www.usvisascheduling.com/en-US/schedule/",
-      referrerPolicy: "strict-origin-when-cross-origin",
-      body: `parameters={"primaryId":"${primaryID}","applications":["${populateGroup()}"],"scheduleDayId":"${dayID}","scheduleEntryId":"${slotID}","postId":"${
-        consular_ids[consularLocation]
-      }"}`,
-      method: "POST",
-      mode: "cors",
-      credentials: "include",
-    }
-  );
+  const response = await fetch(url, {
+    headers: {
+      accept: "application/json, text/javascript, */*; q=0.01",
+      "accept-language": "en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7",
+      "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+      "request-id": generateRequestID(),
+      "sec-ch-ua":
+        '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+      "sec-ch-ua-arch": '"arm"',
+      "sec-ch-ua-bitness": '"64"',
+      "sec-ch-ua-full-version": '"122.0.6261.69"',
+      "sec-ch-ua-full-version-list":
+        '"Chromium";v="122.0.6261.69", "Not(A:Brand";v="24.0.0.0", "Google Chrome";v="122.0.6261.69"',
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-model": '""',
+      "sec-ch-ua-platform": '"macOS"',
+      "sec-ch-ua-platform-version": '"14.3.1"',
+      "sec-fetch-dest": "empty",
+      "sec-fetch-mode": "cors",
+      "sec-fetch-site": "same-origin",
+      traceparent: generateTranceparent(),
+      "x-requested-with": "XMLHttpRequest",
+    },
+    referrer: "https://www.usvisascheduling.com/en-US/schedule/",
+    referrerPolicy: "strict-origin-when-cross-origin",
+    body: `parameters={"primaryId":"${primaryID}","applications":["${populateGroup()}"],"scheduleDayId":"${dayID}","scheduleEntryId":"${slotID}","postId":"${
+      consular_ids[consularLocation]
+    }"}`,
+    method: "POST",
+    mode: "cors",
+    credentials: "include",
+  });
   const data = await response.json();
   return data;
 }
