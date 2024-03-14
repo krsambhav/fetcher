@@ -205,8 +205,8 @@ function messageReceived(msg) {
         var currentMinute = currentDateTime.getMinutes(); // Extract the minutes part
         if (sleeper) {
           if (
-            (currentMinute >= 29 && currentMinute <= 35) ||
-            (currentMinute >= 0 && currentMinute <= 5) ||
+            (currentMinute >= 29 && currentMinute <= 32) ||
+            (currentMinute >= 0 && currentMinute <= 2) ||
             currentMinute >= 59
           ) {
             if (awaitChecker) {
@@ -260,6 +260,7 @@ function messageReceived(msg) {
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
+  // return string;
 }
 
 function randomFloat(min, max) {

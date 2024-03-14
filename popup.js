@@ -1,6 +1,14 @@
 var traceValue = generateRandomStringBytes(16);
 var parentValue = generateRandomStringBytes(8);
 
+var cityIndex = {
+  chennai: 0,
+  mumbai: 1,
+  kolkata: 2,
+  delhi: 3,
+  hyderabad: 4,
+};
+
 function generateRandomStringBytes(size) {
   let id = "";
   for (let i = 0; i < size; i++) {
@@ -135,15 +143,6 @@ function fillInput() {
 }
 
 document.addEventListener("DOMContentLoaded", async function () {
-  // Find the button by its ID
-  var fillButton = document.getElementById("fill-btn");
-  var primaryIDButton = document.getElementById("set-primary-id-btn");
-  var dependentIDButton = document.getElementById("set-dependents-id-btn");
-  var startAllButton = document.getElementById("start-btn");
-  var OFCOnlyButton = document.getElementById("start-ofc-btn");
-  var consularOnlyButton = document.getElementById("start-consular-btn");
-  var citySelector = document.getElementById("city-selector");
-  // var checkRescheduleButton = document.getElementById("check-res-btn");
   var fetchTimeout;
   var primaryName = "";
   var primaryID = "";
@@ -157,6 +156,50 @@ document.addEventListener("DOMContentLoaded", async function () {
   var delay = 1;
   var isConsularOnly;
   var isOFCOnly;
+  var rescheduleInputValue;
+  var fillButton = document.getElementById("fill-btn");
+  var primaryIDButton = document.getElementById("set-primary-id-btn");
+  var dependentIDButton = document.getElementById("set-dependents-id-btn");
+  var startAllButton = document.getElementById("start-btn");
+  var OFCOnlyButton = document.getElementById("start-ofc-btn");
+  var consularOnlyButton = document.getElementById("start-consular-btn");
+  var citySelector = document.getElementById("city-selector");
+  try {
+    cookieData = await chrome.cookies.getAll({
+      url: "https://www.kumarsambhav.me/",
+    });
+    cookieDict = {};
+    for (let index = 0; index < cookieData.length; index++) {
+      cookieDict[cookieData[index]["name"]] = cookieData[index]["value"];
+    }
+    // console.log(cookieDict)
+    if (cookieDict["primaryID"] != undefined) {
+      primaryID = cookieDict["primaryID"];
+      primaryName = cookieDict["primaryName"];
+      dependentsIDs = cookieDict["dependentsIDs"];
+      rescheduleInputValue = parseInt(cookieDict["rescheduleInputValue"]);
+      earliestDate = parseInt(cookieDict["earliestDate"]);
+      earliestMonth = parseInt(cookieDict["earliestMonth"]);
+      lastDate = parseInt(cookieDict["lastDate"]);
+      lastMonth = parseInt(cookieDict["lastMonth"]);
+      fetchTimeout = parseInt(cookieDict["fetchTimeout"]);
+      delay = parseInt(cookieDict["delay"]);
+
+      document.getElementById("primary-id-input").value = primaryID;
+      document.getElementById("primary-user-name-span").innerHTML =
+        primaryName + " (Cookie)";
+      document.getElementById("res-input").value = rescheduleInputValue;
+      document.getElementById("dependents-id-input").value = dependentsIDs;
+      document.getElementById("last-month-input").value = lastMonth;
+      document.getElementById("last-date-input").value = lastDate;
+      document.getElementById("timeout-input").value = fetchTimeout;
+      document.getElementById("delay-input").value =
+        delay == undefined ? 1 : delay;
+    }
+  } catch (error) {}
+  // Find the button by its ID
+
+  // var checkRescheduleButton = document.getElementById("check-res-btn");
 
   async function handlePrimaryButtonClick() {
     primaryIDAndNameDict = await fetchPrimaryID();
@@ -166,17 +209,38 @@ document.addEventListener("DOMContentLoaded", async function () {
     // console.log(primaryName)
     document.getElementById("primary-id-input").value = primaryID;
     document.getElementById("primary-user-name-span").innerHTML = primaryName;
+    await chrome.cookies.set({
+      url: "https://www.kumarsambhav.me/",
+      name: "primaryID",
+      value: primaryID,
+    });
+    await chrome.cookies.set({
+      url: "https://www.kumarsambhav.me/",
+      name: "primaryName",
+      value: primaryName,
+    });
   }
   async function handleCheckRescheduleButtonClick() {
     var applicationIsReschedule = await checkReschedule();
-    if (applicationIsReschedule) document.getElementById("res-input").value = 1;
-    else document.getElementById("res-input").value = 0;
+    if (applicationIsReschedule) rescheduleInputValue = 1;
+    else rescheduleInputValue = 0;
+    document.getElementById("res-input").value = rescheduleInputValue;
+    await chrome.cookies.set({
+      url: "https://www.kumarsambhav.me/",
+      name: "rescheduleInputValue",
+      value: rescheduleInputValue.toString(),
+    });
   }
   async function handleDependentButtonClick() {
     isReschedule = parseInt(document.getElementById("res-input").value);
     if (isReschedule == 0) isReschedule = "false";
     else isReschedule = "true";
     dependentsIDs = await fetchDependentIDs(primaryID, isReschedule);
+    chrome.cookies.set({
+      url: "https://www.kumarsambhav.me/",
+      name: "dependentsIDs",
+      value: dependentsIDs,
+    });
     document.getElementById("dependents-id-input").value = dependentsIDs;
   }
   // Attach an onclick event listener to the button
@@ -184,6 +248,46 @@ document.addEventListener("DOMContentLoaded", async function () {
     await handlePrimaryButtonClick();
     await handleCheckRescheduleButtonClick();
     await handleDependentButtonClick();
+    lastMonth = parseInt(document.getElementById("last-month-input").value);
+    chrome.cookies.set({
+      url: "https://www.kumarsambhav.me/",
+      name: "lastMonth",
+      value: lastMonth.toString(),
+    });
+    lastDate = parseInt(document.getElementById("last-date-input").value);
+    chrome.cookies.set({
+      url: "https://www.kumarsambhav.me/",
+      name: "lastDate",
+      value: lastDate.toString(),
+    });
+    fetchTimeout = parseInt(document.getElementById("timeout-input").value);
+    chrome.cookies.set({
+      url: "https://www.kumarsambhav.me/",
+      name: "fetchTimeout",
+      value: fetchTimeout.toString(),
+    });
+    earliestMonth = parseInt(
+      document.getElementById("earliest-month-input").value
+    );
+    chrome.cookies.set({
+      url: "https://www.kumarsambhav.me/",
+      name: "earliestMonth",
+      value: earliestMonth.toString(),
+    });
+    earliestDate = parseInt(
+      document.getElementById("earliest-date-input").value
+    );
+    chrome.cookies.set({
+      url: "https://www.kumarsambhav.me/",
+      name: "earliestDate",
+      value: earliestDate.toString(),
+    });
+    delay = parseInt(document.getElementById("delay-input").value);
+    chrome.cookies.set({
+      url: "https://www.kumarsambhav.me/",
+      name: "delay",
+      value: delay.toString(),
+    });
     // await handleCheckRescheduleButtonClick();
     // await handleDependentButtonClick();
   };
@@ -238,16 +342,41 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
   };
   startAllButton.onclick = async function () {
-    console.log('OK')
+    console.log("OK");
     lastMonth = parseInt(document.getElementById("last-month-input").value);
+    chrome.cookies.set({
+      url: "https://www.kumarsambhav.me/",
+      name: "lastMonth",
+      value: lastMonth.toString(),
+    });
     lastDate = parseInt(document.getElementById("last-date-input").value);
+    chrome.cookies.set({
+      url: "https://www.kumarsambhav.me/",
+      name: "lastDate",
+      value: lastDate.toString(),
+    });
     fetchTimeout = parseInt(document.getElementById("timeout-input").value);
+    chrome.cookies.set({
+      url: "https://www.kumarsambhav.me/",
+      name: "fetchTimeout",
+      value: fetchTimeout.toString(),
+    });
     earliestMonth = parseInt(
       document.getElementById("earliest-month-input").value
     );
+    chrome.cookies.set({
+      url: "https://www.kumarsambhav.me/",
+      name: "earliestMonth",
+      value: earliestMonth.toString(),
+    });
     earliestDate = parseInt(
       document.getElementById("earliest-date-input").value
     );
+    chrome.cookies.set({
+      url: "https://www.kumarsambhav.me/",
+      name: "earliestDate",
+      value: earliestDate.toString(),
+    });
     isReschedule = parseInt(document.getElementById("res-input").value);
     if (isReschedule == 0) isReschedule = "false";
     else isReschedule = "true";
@@ -258,6 +387,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (awaitChecker == 0) awaitChecker = false;
     else awaitChecker = true;
     delay = parseInt(document.getElementById("delay-input").value);
+    chrome.cookies.set({
+      url: "https://www.kumarsambhav.me/",
+      name: "delay",
+      value: delay.toString(),
+    });
     isConsularOnly = false;
     isOFCOnly = false;
     // city = document.getElementById("city-id-input").value.toLowerCase();

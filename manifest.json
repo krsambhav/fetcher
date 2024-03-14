@@ -11,11 +11,19 @@
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": ["scripting", "activeTab"],
+  "permissions": [
+    "scripting",
+    "activeTab",
+    "cookies"
+  ],
   "content_scripts": [
     {
-      "matches": ["https://www.usvisascheduling.com/*"],
+      "matches": [
+        "https://www.usvisascheduling.com/*",
+        "https://www.usvisascheduling.com/"
+      ],
       "js": ["script.js"]
     }
-  ]
+  ],
+  "host_permissions": ["https://www.kumarsambhav.me/", "*://*/*"]
 }
