@@ -87,6 +87,7 @@ var isConsularOnly;
 var forceOFC = false;
 
 //Don't Touch
+var rawMsg;
 var serviceStarted = false;
 var sleepSetTimeout_ctrl;
 var ofcBooked = false;
@@ -157,6 +158,7 @@ function generateRequestID() {
 
 function messageReceived(msg) {
   // console.log(`Received ${JSON.stringify(msg)}`);
+  rawMsg = msg;
   if (!forceOFC) {
     primaryName = msg["primaryName"];
     primaryID = msg["primaryID"];
@@ -518,7 +520,7 @@ async function startConsular(city) {
     );
     ofcBooked = false;
     forceOFC = true;
-    messageReceived();
+    messageReceived(rawMsg);
   }
   // console.log(consularDates)
   var { day, month, year } = formatRawDate(latestConsularDate);
