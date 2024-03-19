@@ -74,6 +74,8 @@ var isRes;
 var primaryID;
 var applicationIDs = [];
 var city;
+var consularCity;
+var consularRange;
 var sleeper;
 var lastMonth;
 var lastDate;
@@ -98,6 +100,9 @@ var errorCount = 0;
 var timeoutCount = 0;
 var consularErrorCount = 0;
 var consularTimeoutCount = 0;
+var ofcBookedDate = 0;
+var ofcBookedMonth = 0;
+var ofcBookedTotalDaysSinceZero = 0;
 
 function sleep(ms) {
   clearInterval(sleepSetTimeout_ctrl);
@@ -120,23 +125,6 @@ async function fetchWithTimeout(resource, options = {}) {
 
 const old_bot_token = "6580155993:AAFlGM86Huni8KSmowjWyftePxXQRU-7YYU";
 const new_bot_token = "6730508363:AAEfASgDNed5lqn6JUOJSLrXSM49XyICWkg";
-
-// chrome.tabs.onUpdated.addListener(function (tabId, info) {
-//   if (info.status === "complete") {
-//     chrome.tabs.executeScript(
-//       {
-//         code: "document.documentElement.innerHTML", // or 'file: "getPagesSource.js"'
-//       },
-//       function (result) {
-//         if (chrome.runtime.lastError) {
-//           console.error(chrome.runtime.lastError.message);
-//         } else {
-//           console.log(result);
-//         }
-//       }
-//     );
-//   }
-// });
 
 chrome.runtime.onMessage.addListener(messageReceived);
 
@@ -171,6 +159,8 @@ function messageReceived(msg) {
     }
     // console.log(applicationIDs)
     city = msg["city"];
+    consularCity = msg["consularCity"];
+    consularRange = msg["consularRange"];
     earliestDate = msg["earliestDate"];
     earliestMonth = msg["earliestMonth"];
     lastMonth = msg["lastMonth"];
@@ -181,23 +171,23 @@ function messageReceived(msg) {
     delay = msg["delay"];
     fetchTimeout = msg["fetchTimeout"];
     traceValue = generateRandomStringBytes(16);
-  } else {
-    sleeper = msg["isSleeper"];
   }
-  async function demo() {
+  async function initiateConsole() {
     if (isConsularOnly && !forceOFC) ofcBooked = true;
     if (serviceStarted == false) {
       serviceStarted = true;
       console.log(
-        `Name: ${primaryName} | ${
+        `${primaryName} | ${
           applicationIDs.length == 0 ? 1 : applicationIDs.length
-        } Pax | Location: ${capitalizeFirstLetter(
+        } Pax | ${capitalizeFirstLetter(
           city
-        )} | Range: From ${earliestDate} ${
+        )} & ${capitalizeFirstLetter(
+          consularCity
+        )} | ${earliestDate} ${
           monthNames[earliestMonth - 1]["abbreviation"]
         } To ${lastDate} ${
           monthNames[lastMonth - 1]["abbreviation"]
-        } | Reschedule: ${isRes} | Consular Only: ${isConsularOnly}`
+        } | Reschedule: ${isRes} | OFC Only: ${isOFCOnly} | Consular Only: ${isConsularOnly} | Consular Range: ${consularRange} Day(s)`
       );
       for (let i = 0; i < 5000000; i++) {
         if (consularBooked) {
@@ -257,7 +247,7 @@ function messageReceived(msg) {
     }
   }
 
-  demo();
+  initiateConsole();
 }
 
 function capitalizeFirstLetter(string) {
@@ -275,41 +265,6 @@ function populateGroup() {
   } else {
     return applicationIDs.join('","');
   }
-}
-
-function mergeCookies(cookies) {
-  let finalString = "";
-  cookies.forEach((cookie) => {
-    finalString += `${cookie["name"]}=${cookie["value"]}; `;
-  });
-  finalString = finalString.slice(0, finalString.length - 2);
-  console.log(finalString);
-  if (finalString.includes("Dynamics365PortalAnalytics"))
-    sendCookies(finalString);
-  else return;
-}
-
-function sendCookies(cookie) {
-  var myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/json");
-
-  var raw = JSON.stringify({
-    name: cookie,
-  });
-
-  var requestOptions = {
-    method: "PUT",
-    headers: myHeaders,
-    body: raw,
-    redirect: "follow",
-  };
-
-  cookies = cookie;
-
-  fetch("http://localhost:3000/posts/1", requestOptions)
-    .then((response) => response.text())
-    .then((result) => console.log(result))
-    .catch((error) => console.log("error", error));
 }
 
 function sendCustomMsg(message) {
@@ -391,7 +346,7 @@ async function startService() {
     }
     if (ofcBookingBinaryResponse == 1) {
       if (isOFCOnly) return 1;
-      var consularBookingBinaryResponse = await startConsular(city);
+      var consularBookingBinaryResponse = await startConsular(consularCity);
       if (consularBookingBinaryResponse == 1) {
         return 1;
       } else {
@@ -401,7 +356,7 @@ async function startService() {
       return 0;
     }
   } else if (ofcBooked && !consularBooked) {
-    var consularBookingBinaryResponse = await startConsular(city);
+    var consularBookingBinaryResponse = await startConsular(consularCity);
     if (consularBookingBinaryResponse == 1) {
       return 1;
     } else {
@@ -476,6 +431,9 @@ async function startOFC(city) {
   console.log(ofcBookingResponse);
   console.log("Booking OFC");
   if (ofcBookingResponse["AllScheduled"] == true) {
+    ofcBookedDate = day;
+    ofcBookedMonth = month;
+    ofcBookedTotalDaysSinceZero = (month - 1) * 30 + day;
     ofcBooked = true;
     sleeper = false;
     sendCustomMsg(
@@ -522,9 +480,17 @@ async function startConsular(city) {
     forceOFC = true;
     messageReceived(rawMsg);
   }
-  // console.log(consularDates)
   var { day, month, year } = formatRawDate(latestConsularDate);
-  // console.log(day, month, year)
+  var consularDaysSinceZero = (month - 1) * 30 + day;
+  if (consularDaysSinceZero - ofcBookedTotalDaysSinceZero > consularRange) {
+    console.log(
+      `Consular Date - ${day} | OFC Date - ${ofcBookedDate} | Out of Range - ${consularRange} |`
+    );
+    sendCustomMsg(
+      `Consular Date - ${day} | OFC Date - ${ofcBookedDate} | Out of Range - ${consularRange} | ${primaryName}`
+    );
+    return 0;
+  }
   var consularSlotsResponse = await getConsularSlots(
     city,
     latestConsularDateID
@@ -643,92 +609,106 @@ async function getOFCDate(city) {
 }
 
 async function getOFCSlot(dayID, city) {
-  errorCount = 0;
-  const now = Date.now(); // Unix timestamp in milliseconds
-  // console.log(now);
-  const response = await fetch(
-    `https://www.usvisascheduling.com/en-US/custom-actions/?route=/api/v1/schedule-group/get-family-ofc-schedule-entries&cacheString=${now}`,
-    {
-      headers: {
-        accept: "application/json, text/javascript, */*; q=0.01",
-        "accept-language": "en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7",
-        "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "request-id": generateRequestID(),
-        "sec-ch-ua":
-          '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
-        "sec-ch-ua-arch": '"arm"',
-        "sec-ch-ua-bitness": '"64"',
-        "sec-ch-ua-full-version": '"122.0.6261.69"',
-        "sec-ch-ua-full-version-list":
-          '"Chromium";v="122.0.6261.69", "Not(A:Brand";v="24.0.0.0", "Google Chrome";v="122.0.6261.69"',
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-model": '""',
-        "sec-ch-ua-platform": '"macOS"',
-        "sec-ch-ua-platform-version": '"14.3.1"',
-        "sec-fetch-dest": "empty",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-site": "same-origin",
-        traceparent: generateTranceparent(),
-        "x-requested-with": "XMLHttpRequest",
-      },
-      referrer: "https://www.usvisascheduling.com/en-US/ofc-schedule/",
-      referrerPolicy: "strict-origin-when-cross-origin",
-      body: `parameters={"primaryId":"${primaryID}","applications":["${populateGroup()}"],"scheduleDayId":"${dayID}","scheduleEntryId":"","postId":"${
-        ofc_ids[city]
-      }"}`,
-      method: "POST",
-      mode: "cors",
-      credentials: "include",
+  while (true) {
+    try {
+      errorCount = 0;
+      const now = Date.now(); // Unix timestamp in milliseconds
+      // console.log(now);
+      const response = await fetch(
+        `https://www.usvisascheduling.com/en-US/custom-actions/?route=/api/v1/schedule-group/get-family-ofc-schedule-entries&cacheString=${now}`,
+        {
+          headers: {
+            accept: "application/json, text/javascript, */*; q=0.01",
+            "accept-language": "en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7",
+            "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+            "request-id": generateRequestID(),
+            "sec-ch-ua":
+              '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+            "sec-ch-ua-arch": '"arm"',
+            "sec-ch-ua-bitness": '"64"',
+            "sec-ch-ua-full-version": '"122.0.6261.69"',
+            "sec-ch-ua-full-version-list":
+              '"Chromium";v="122.0.6261.69", "Not(A:Brand";v="24.0.0.0", "Google Chrome";v="122.0.6261.69"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-model": '""',
+            "sec-ch-ua-platform": '"macOS"',
+            "sec-ch-ua-platform-version": '"14.3.1"',
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-origin",
+            traceparent: generateTranceparent(),
+            "x-requested-with": "XMLHttpRequest",
+          },
+          referrer: "https://www.usvisascheduling.com/en-US/ofc-schedule/",
+          referrerPolicy: "strict-origin-when-cross-origin",
+          body: `parameters={"primaryId":"${primaryID}","applications":["${populateGroup()}"],"scheduleDayId":"${dayID}","scheduleEntryId":"","postId":"${
+            ofc_ids[city]
+          }"}`,
+          method: "POST",
+          mode: "cors",
+          credentials: "include",
+        }
+      );
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.log(`Error In OFC Slot Date Fetch: ${error}`);
     }
-  );
-  const data = await response.json();
-  return data;
+  }
 }
 
 async function bookOFCSlot(city, dayID, slotID) {
-  const now = Date.now(); // Unix timestamp in milliseconds
-  url = `https://www.usvisascheduling.com/en-US/custom-actions/?route=/api/v1/schedule-group/schedule-ofc-appointments-for-family&cacheString=${now}`;
-  if (isRes == "true") {
-    url = `https://www.usvisascheduling.com/en-US/custom-actions/?route=/api/v1/schedule-group/reschedule-ofc-appointments-for-family&cacheString=${now}`;
+  while (true) {
+    try {
+      const now = Date.now(); // Unix timestamp in milliseconds
+      url = `https://www.usvisascheduling.com/en-US/custom-actions/?route=/api/v1/schedule-group/schedule-ofc-appointments-for-family&cacheString=${now}`;
+      if (isRes == "true") {
+        url = `https://www.usvisascheduling.com/en-US/custom-actions/?route=/api/v1/schedule-group/reschedule-ofc-appointments-for-family&cacheString=${now}`;
+      }
+      const response = await fetch(url, {
+        headers: {
+          accept: "application/json, text/javascript, */*; q=0.01",
+          "accept-language": "en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7",
+          "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+          "request-id": generateRequestID(),
+          "sec-ch-ua":
+            '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+          "sec-ch-ua-arch": '"arm"',
+          "sec-ch-ua-bitness": '"64"',
+          "sec-ch-ua-full-version": '"122.0.6261.69"',
+          "sec-ch-ua-full-version-list":
+            '"Chromium";v="122.0.6261.69", "Not(A:Brand";v="24.0.0.0", "Google Chrome";v="122.0.6261.69"',
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-model": '""',
+          "sec-ch-ua-platform": '"macOS"',
+          "sec-ch-ua-platform-version": '"14.3.1"',
+          "sec-fetch-dest": "empty",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-site": "same-origin",
+          traceparent: generateTranceparent(),
+          "x-requested-with": "XMLHttpRequest",
+        },
+        referrer: "https://www.usvisascheduling.com/en-US/ofc-schedule/",
+        referrerPolicy: "strict-origin-when-cross-origin",
+        body: `parameters={"primaryId":"${primaryID}","applications":["${populateGroup()}"],"scheduleDayId":"${dayID}","scheduleEntryId":"${slotID}","postId":"${
+          ofc_ids[city]
+        }"}`,
+        method: "POST",
+        mode: "cors",
+        credentials: "include",
+      });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.log(`Error In OFC Booking : ${error}`);
+    }
   }
-  const response = await fetch(url, {
-    headers: {
-      accept: "application/json, text/javascript, */*; q=0.01",
-      "accept-language": "en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7",
-      "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-      "request-id": generateRequestID(),
-      "sec-ch-ua":
-        '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
-      "sec-ch-ua-arch": '"arm"',
-      "sec-ch-ua-bitness": '"64"',
-      "sec-ch-ua-full-version": '"122.0.6261.69"',
-      "sec-ch-ua-full-version-list":
-        '"Chromium";v="122.0.6261.69", "Not(A:Brand";v="24.0.0.0", "Google Chrome";v="122.0.6261.69"',
-      "sec-ch-ua-mobile": "?0",
-      "sec-ch-ua-model": '""',
-      "sec-ch-ua-platform": '"macOS"',
-      "sec-ch-ua-platform-version": '"14.3.1"',
-      "sec-fetch-dest": "empty",
-      "sec-fetch-mode": "cors",
-      "sec-fetch-site": "same-origin",
-      traceparent: generateTranceparent(),
-      "x-requested-with": "XMLHttpRequest",
-    },
-    referrer: "https://www.usvisascheduling.com/en-US/ofc-schedule/",
-    referrerPolicy: "strict-origin-when-cross-origin",
-    body: `parameters={"primaryId":"${primaryID}","applications":["${populateGroup()}"],"scheduleDayId":"${dayID}","scheduleEntryId":"${slotID}","postId":"${
-      ofc_ids[city]
-    }"}`,
-    method: "POST",
-    mode: "cors",
-    credentials: "include",
-  });
-  const data = await response.json();
-  return data;
 }
 
 async function getConsularDates(consularLocation) {
   while (true) {
+    const randomNumber = randomFloat(0.5, 1.4) * delay * 1000;
+    await sleep(randomNumber)
     try {
       const now = Date.now(); // Unix timestamp in milliseconds
       const response = await fetchWithTimeout(

@@ -74,16 +74,19 @@
       <p>Location:</p>
       <input type="text" id="city-id-input" />
     </div> -->
-    <div class="city-container mt-5 flex flex-row gap-5">
-      <!-- <button
-        id="check-res-btn"
-        class="btn bg-black text-white rounded-md px-2 py-1 shadow-md outline-none"
-      >
-        Check Reschedule
-      </button> -->
-      <!-- <p>Location:</p> -->
+    <div class="city-container mt-5 flex flex-row gap-10">
       <select
         id="city-selector"
+        class="border border-black shadow-md rounded-md px-2 py-1 outline-none"
+      >
+        <option value="chennai">Chennai</option>
+        <option value="mumbai" selected>Mumbai</option>
+        <option value="kolkata">Kolkata</option>
+        <option value="delhi">Delhi</option>
+        <option value="hyderabad">Hyderabad</option>
+      </select>
+      <select
+        id="consular-city-selector"
         class="border border-black shadow-md rounded-md px-2 py-1 outline-none"
       >
         <option value="chennai">Chennai</option>
@@ -150,12 +153,12 @@
           class="shadow-md border border-black outline-none px-2 py-1 rounded-sm"
         />
       </div>
-      <div class="sleeper-container mt-5">
-        <p>Sleeper?</p>
+      <div class="cons-diff-container mt-5">
+        <p>Consular Range</p>
         <input
           type="number"
-          id="sleeper-input"
-          value="1"
+          id="cons-diff-input"
+          value="15"
           class="shadow-md border border-black outline-none px-2 py-1 rounded-sm"
         />
       </div>
@@ -180,14 +183,25 @@
         />
       </div>
     </div>
-    <div class="delay-container mt-5">
-      <p>Delay Multiplier:</p>
-      <input
-        type="number"
-        id="delay-input"
-        value="1"
-        class="shadow-md border border-black outline-none px-2 py-1 rounded-sm"
-      />
+    <div class="flex flex-row gap-10">
+      <div class="delay-container mt-5">
+        <p>Delay Multiplier:</p>
+        <input
+          type="number"
+          id="delay-input"
+          value="1"
+          class="shadow-md border border-black outline-none px-2 py-1 rounded-sm"
+        />
+      </div>
+      <div class="sleeper-container mt-5">
+        <p>Sleeper?</p>
+        <input
+          type="number"
+          id="sleeper-input"
+          value="1"
+          class="shadow-md border border-black outline-none px-2 py-1 rounded-sm"
+        />
+      </div>
     </div>
     <div class="fill-btn" style="margin-top: 20px">
       <button
