@@ -319,6 +319,11 @@ document.addEventListener("DOMContentLoaded", async function () {
       name: "city",
       value: city,
     });
+    chrome.cookies.set({
+      url: "https://www.kumarsambhav.me/",
+      name: "consularCity",
+      value: consularCity,
+    });
   };
   consularCitySelector.onchange = async function () {
     consularCity = consularCitySelector.value;
