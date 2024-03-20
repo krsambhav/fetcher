@@ -194,11 +194,12 @@ document.addEventListener("DOMContentLoaded", async function () {
       fetchTimeout = parseInt(cookieDict["fetchTimeout"]);
       delay = parseInt(cookieDict["delay"]);
       city = cookieDict["city"] == undefined ? "mumbai" : cookieDict["city"];
+      citySelector.value = city;
       consularCity =
         cookieDict["consularCity"] == undefined
           ? "mumbai"
           : cookieDict["consularCity"];
-
+      consularCitySelector.value = consularCity;
       document.getElementById("primary-id-input").value = primaryID;
       document.getElementById("primary-user-name-span").innerHTML =
         primaryName + " (Cookie)";
