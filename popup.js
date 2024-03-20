@@ -312,6 +312,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   primaryIDButton.onclick = handlePrimaryButtonClick;
   citySelector.onchange = async function () {
     city = citySelector.value;
+    consularCity = city;
     consularCitySelector.value = city;
     chrome.cookies.set({
       url: "https://www.kumarsambhav.me/",
