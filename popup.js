@@ -344,7 +344,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   // checkRescheduleButton.onclick = handleCheckRescheduleButtonClick;
   dependentIDButton.onclick = handleDependentButtonClick;
   OFCOnlyButton.onclick = async function () {
-    if (consularRange == undefined) consularRange = 15;
+    if (consularRange == undefined) consularRange = 20;
     lastMonth = parseInt(document.getElementById("last-month-input").value);
     lastDate = parseInt(document.getElementById("last-date-input").value);
     fetchTimeout = parseInt(document.getElementById("timeout-input").value);
@@ -391,7 +391,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
   };
   startAllButton.onclick = async function () {
-    if (consularRange == undefined) consularRange = 15;
+    if (consularRange == undefined) consularRange = 20;
     console.log("OK");
     lastMonth = parseInt(document.getElementById("last-month-input").value);
     chrome.cookies.set({
@@ -469,7 +469,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
   };
   consularOnlyButton.onclick = async function () {
-    if (consularRange == undefined) consularRange = 15;
+    if (consularRange == undefined) consularRange = 20;
     lastMonth = parseInt(document.getElementById("last-month-input").value);
     lastDate = parseInt(document.getElementById("last-date-input").value);
     fetchTimeout = parseInt(document.getElementById("timeout-input").value);
