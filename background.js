@@ -482,15 +482,15 @@ async function startConsular(city) {
   }
   var { day, month, year } = formatRawDate(latestConsularDate);
   var consularDaysSinceZero = (month - 1) * 30 + day;
-  if (consularDaysSinceZero - ofcBookedTotalDaysSinceZero > consularRange) {
-    console.log(
-      `Consular Date - ${day} | OFC Date - ${ofcBookedDate} | Out of Range - ${consularRange} |`
-    );
-    sendCustomMsg(
-      `Consular Date - ${day} | OFC Date - ${ofcBookedDate} | Out of Range - ${consularRange} | ${primaryName}`
-    );
-    return 0;
-  }
+  // if (consularDaysSinceZero - ofcBookedTotalDaysSinceZero > consularRange && !isConsularOnly) {
+  //   console.log(
+  //     `Consular Date - ${day} | OFC Date - ${ofcBookedDate} | Out of Range - ${consularRange} |`
+  //   );
+  //   sendCustomMsg(
+  //     `Consular Date - ${day} | OFC Date - ${ofcBookedDate} | Out of Range - ${consularRange} | ${primaryName}`
+  //   );
+  //   return 0;
+  // }
   var consularSlotsResponse = await getConsularSlots(
     city,
     latestConsularDateID
