@@ -103,6 +103,7 @@ var consularTimeoutCount = 0;
 var ofcBookedDate = 0;
 var ofcBookedMonth = 0;
 var ofcBookedTotalDaysSinceZero = 0;
+var tempMinute = 100;
 
 function sleep(ms) {
   clearInterval(sleepSetTimeout_ctrl);
@@ -179,9 +180,7 @@ function messageReceived(msg) {
       console.log(
         `${primaryName} | ${
           applicationIDs.length == 0 ? 1 : applicationIDs.length
-        } Pax | ${capitalizeFirstLetter(
-          city
-        )} & ${capitalizeFirstLetter(
+        } Pax | ${capitalizeFirstLetter(city)} & ${capitalizeFirstLetter(
           consularCity
         )} | ${earliestDate} ${
           monthNames[earliestMonth - 1]["abbreviation"]
@@ -189,7 +188,7 @@ function messageReceived(msg) {
           monthNames[lastMonth - 1]["abbreviation"]
         } | Reschedule: ${isRes} | OFC Only: ${isOFCOnly} | Consular Only: ${isConsularOnly} | Consular Range: ${consularRange} Day(s)`
       );
-      for (let i = 0; i < 5000000; i++) {
+      while (true) {
         if (consularBooked) {
           break;
         }
@@ -217,7 +216,19 @@ function messageReceived(msg) {
               break;
             }
           } else {
-            // console.log("Waiting!");
+            if (tempMinute != currentMinute) {
+              await sleep(randomFloat(2000, 7000));
+              tempMinute = currentMinute;
+              // console.log('Started')
+              var serviceBinaryResponse = await startService();
+              if (serviceBinaryResponse == "ECE") {
+                return "ECE";
+              }
+              if (serviceBinaryResponse == 1) {
+                console.log("All Done!");
+                break;
+              }
+            }
           }
         } else {
           if (awaitChecker) {
@@ -482,15 +493,18 @@ async function startConsular(city) {
   }
   var { day, month, year } = formatRawDate(latestConsularDate);
   var consularDaysSinceZero = (month - 1) * 30 + day;
-  // if (consularDaysSinceZero - ofcBookedTotalDaysSinceZero > consularRange && !isConsularOnly) {
-  //   console.log(
-  //     `Consular Date - ${day} | OFC Date - ${ofcBookedDate} | Out of Range - ${consularRange} |`
-  //   );
-  //   sendCustomMsg(
-  //     `Consular Date - ${day} | OFC Date - ${ofcBookedDate} | Out of Range - ${consularRange} | ${primaryName}`
-  //   );
-  //   return 0;
-  // }
+  if (
+    consularDaysSinceZero - ofcBookedTotalDaysSinceZero > consularRange &&
+    !isConsularOnly
+  ) {
+    console.log(
+      `Consular Date - ${day} | OFC Date - ${ofcBookedDate} | Out of Range - ${consularRange} |`
+    );
+    sendCustomMsg(
+      `Consular Date - ${day} | OFC Date - ${ofcBookedDate} | Out of Range - ${consularRange} | ${primaryName}`
+    );
+    return 0;
+  }
   var consularSlotsResponse = await getConsularSlots(
     city,
     latestConsularDateID
@@ -708,7 +722,7 @@ async function bookOFCSlot(city, dayID, slotID) {
 async function getConsularDates(consularLocation) {
   while (true) {
     const randomNumber = randomFloat(0.5, 1.4) * delay * 1000;
-    await sleep(randomNumber)
+    await sleep(randomNumber);
     try {
       const now = Date.now(); // Unix timestamp in milliseconds
       const response = await fetchWithTimeout(
