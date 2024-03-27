@@ -217,7 +217,7 @@ function messageReceived(msg) {
             }
           } else {
             if (tempMinute != currentMinute) {
-              await sleep(randomFloat(2000, 7000));
+              await sleep(randomFloat(2000, 10000));
               tempMinute = currentMinute;
               // console.log('Started')
               var serviceBinaryResponse = await startService();
@@ -281,6 +281,16 @@ function populateGroup() {
 function sendCustomMsg(message) {
   fetch(
     `https://api.telegram.org/bot6580155993:AAFlGM86Huni8KSmowjWyftePxXQRU-7YYU/sendMessage?chat_id=5307938436&parse_mode=MarkdownV2&text=\`${encodeURI(
+      message
+    )}\``
+  );
+  // .then(response => response.json()).then(data => console.log(data))
+  // console.log("Sent TG Message");
+}
+
+function sendCustomError(message) {
+  fetch(
+    `https://api.telegram.org/bot6730508363:AAEfASgDNed5lqn6JUOJSLrXSM49XyICWkg/sendMessage?chat_id=5307938436&parse_mode=MarkdownV2&text=\`${encodeURI(
       message
     )}\``
   );
@@ -463,8 +473,22 @@ async function startOFC(city) {
     );
     return 1;
   } else {
-    console.log("OFC Booking Error");
-    sendCustomMsg(`OFC Error For ${primaryName}`);
+    try {
+      var errorString = ofcBookingResponse["Errors"]["m_StringValue"];
+      if (errorString.length > 5) {
+        errorString = "Gone";
+      }
+
+      console.log("OFC Booking Error");
+      sendCustomError(
+        `Booking Incomplete For ${primaryName} | ${
+          applicationIDs.length == 0 ? 1 : applicationIDs.length
+        } Pax | Error: ${errorString}`
+      );
+    } catch (error) {
+      console.log("Error In Error Reporting");
+      sendCustomError(`Error In Error Reporting | ${primaryName}`);
+    }
   }
   return 0;
 }
@@ -484,7 +508,7 @@ async function startConsular(city) {
       return 0;
     }
   } catch (error) {
-    sendCustomMsg(
+    sendCustomError(
       `Consular Reading Failed For ${primaryName}, Process Stopped.`
     );
     ofcBooked = false;
@@ -501,7 +525,7 @@ async function startConsular(city) {
       `Consular Date - ${day} | OFC Date - ${ofcBookedDate} | Out of Range - ${consularRange} |`
     );
     sendCustomMsg(
-      `Consular Date - ${day} | OFC Date - ${ofcBookedDate} | Out of Range - ${consularRange} | ${primaryName}`
+      `Consular Date - ${day} | OFC Date - ${ofcBookedDate} | Out of Range - ${consularRange} | ${primaryName} Days`
     );
     return 0;
   }
@@ -534,7 +558,9 @@ async function startConsular(city) {
     console.log(
       `Consular Booked For ${capitalizeFirstLetter(
         city
-      )} On ${day}/${month}/${year} For ${primaryName}`
+      )} On ${day}/${month}/${year} For ${primaryName} | ${
+        applicationIDs.length == 0 ? 1 : applicationIDs.length
+      } Pax`
     );
     return 1;
   }
@@ -609,7 +635,7 @@ async function getOFCDate(city) {
           console.log(`Timeout Exception. Count: ${timeoutCount}`);
       } else if (errorCount > 10) {
         errorCount++;
-        sendCustomMsg(`Error Count Exceeded For ${primaryName}`);
+        sendCustomError(`Error Count Exceeded For ${primaryName}`);
         console.log("Error Count Exceeded!");
         return "ECE";
       } else {
@@ -721,7 +747,7 @@ async function bookOFCSlot(city, dayID, slotID) {
 
 async function getConsularDates(consularLocation) {
   while (true) {
-    const randomNumber = randomFloat(0.5, 1.4) * delay * 1000;
+    const randomNumber = randomFloat(0.5, 1.8) * delay * 1000;
     await sleep(randomNumber);
     try {
       const now = Date.now(); // Unix timestamp in milliseconds
