@@ -151,6 +151,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   var isConsularOnly;
   var isOFCOnly;
   var rescheduleInputValue;
+  var userQty = 0;
+  var isSleeper = 1;
   var [currentMonth, currentDate] = new Date()
     .toLocaleString("en-US", {
       timeZone: "Asia/Kolkata",
@@ -164,6 +166,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     parseInt(currentMonth);
   console.log(0);
   var fillButton = document.getElementById("fill-btn");
+  var resetButton = document.getElementById("reset-btn");
   var primaryIDButton = document.getElementById("set-primary-id-btn");
   var dependentIDButton = document.getElementById("set-dependents-id-btn");
   var startAllButton = document.getElementById("start-btn");
@@ -185,9 +188,10 @@ document.addEventListener("DOMContentLoaded", async function () {
       primaryID = cookieDict["primaryID"];
       primaryName = cookieDict["primaryName"];
       dependentsIDs = cookieDict["dependentsIDs"];
+      userQty = parseInt(cookieDict["userQty"]);
       rescheduleInputValue = parseInt(cookieDict["rescheduleInputValue"]);
       earliestDate = parseInt(cookieDict["earliestDate"]);
-      console.log(1)
+      console.log(1);
       earliestMonth = parseInt(cookieDict["earliestMonth"]);
       lastDate = parseInt(cookieDict["lastDate"]);
       lastMonth = parseInt(cookieDict["lastMonth"]);
@@ -204,6 +208,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       document.getElementById("primary-user-name-span").innerHTML =
         primaryName + " (Cookie)";
       document.getElementById("res-input").value = rescheduleInputValue;
+      document.getElementById("primary-user-qty-span").innerHTML = userQty;
       document.getElementById("dependents-id-input").value = dependentsIDs;
       document.getElementById("earliest-month-input").value = earliestMonth;
       document.getElementById("earliest-date-input").value = earliestDate;
@@ -225,7 +230,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Code to execute when the button is clicked
     // console.log(primaryName)
     document.getElementById("primary-id-input").value = primaryID;
-    document.getElementById("primary-user-name-span").innerHTML = primaryName;
     await chrome.cookies.set({
       url: "https://www.kumarsambhav.me/",
       name: "primaryID",
@@ -259,6 +263,20 @@ document.addEventListener("DOMContentLoaded", async function () {
       value: dependentsIDs,
     });
     document.getElementById("dependents-id-input").value = dependentsIDs;
+    var dIdsFirstLetter = dependentsIDs.slice(0, 1);
+
+    if (dIdsFirstLetter == "[") {
+      userQty = JSON.parse(dependentsIDs).length;
+    } else {
+      userQty = 1;
+    }
+    document.getElementById("primary-user-qty-span").innerHTML = userQty;
+    document.getElementById("primary-user-name-span").innerHTML = primaryName;
+    chrome.cookies.set({
+      url: "https://www.kumarsambhav.me/",
+      name: "userQty",
+      value: userQty.toString(),
+    });
   }
   // Attach an onclick event listener to the button
   fillButton.onclick = async function () {
@@ -308,6 +326,44 @@ document.addEventListener("DOMContentLoaded", async function () {
     consularRange = parseInt(consularRangeInput.value);
     // await handleCheckRescheduleButtonClick();
     // await handleDependentButtonClick();
+  };
+  resetButton.onclick = async function () {
+    // document.getElementById("primary-user-name-span").innerHTML = ""
+    // document.getElementById("primary-id-input").value = ""
+    // primaryName = "";
+    // document.getElementById("dependents-id-input").value = ""
+    // dependentsIDs = "";
+    // document.getElementById("primary-user-qty-span").innerHTML = "";
+    // userQty = 0;
+    var tempCurrentMonth = new Date().getMonth() + 1;
+    var tempCurrentDate = new Date().getDate();
+    var tempLastMonth = tempCurrentDate <= 15 ? tempCurrentMonth : tempCurrentMonth + 1;
+    earliestMonth = new Date().getMonth() + 1;
+    earliestDate = tempCurrentDate;
+    lastMonth = tempLastMonth;
+    lastDate = tempLastMonth == tempCurrentMonth ? tempCurrentDate + 20 : 20;
+    delay = 1;
+    isSleeper = 1;
+    document.getElementById("earliest-month-input").value = tempCurrentMonth;
+    document.getElementById("earliest-date-input").value = earliestDate;
+    document.getElementById("last-month-input").value = lastMonth;
+    document.getElementById("last-date-input").value = lastDate;
+    document.getElementById("delay-input").value = 1;
+    document.getElementById("sleeper-input").value = 1;
+    citySelector.value = 'mumbai'
+    city = 'mumbai'
+    consularCitySelector.value = 'mumbai'
+    consularCity = 'mumbai'
+    chrome.cookies.set({
+      url: "https://www.kumarsambhav.me/",
+      name: "city",
+      value: city,
+    });
+    chrome.cookies.set({
+      url: "https://www.kumarsambhav.me/",
+      name: "consularCity",
+      value: consularCity,
+    });
   };
   primaryIDButton.onclick = handlePrimaryButtonClick;
   citySelector.onchange = async function () {

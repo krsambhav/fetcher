@@ -354,7 +354,7 @@ async function startService() {
   console.log(
     `Location: ${capitalizeFirstLetter(
       city
-    )} | Time: ${new Date().toLocaleString()} | Name: ${primaryName} | Total Pax: ${
+    )} | Time: ${new Date().toLocaleString()} | ${primaryName} | Total Pax: ${
       applicationIDs.length == 0 ? 1 : applicationIDs.length
     }`
   );
